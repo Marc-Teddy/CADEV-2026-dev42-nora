@@ -1,6 +1,6 @@
 FROM node:20-bookworm-slim AS dependencies
 WORKDIR /app
-COPY backend/package*.json ./
+COPY backend/api/package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 FROM node:20-bookworm-slim AS runtime
@@ -9,7 +9,7 @@ WORKDIR /app
 RUN groupadd --system nora && useradd --system --gid nora nora
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY package*.json ./
-COPY backend/src ./src
+COPY backend/api/src ./src
 COPY db/migrations ./db/migrations
 USER nora
 EXPOSE 8080

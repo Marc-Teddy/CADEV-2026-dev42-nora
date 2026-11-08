@@ -52,7 +52,8 @@ NORA s'appuie sur une architecture modulaire composée de trois parties principa
 ```text
 NORA/
 ├── frontend/       # Interface utilisateur
-├── backend/        # API et logique métier
+├── backend/
+│   └── api/        # API et logique métier
 ├── ai-service/     # Service d'intelligence artificielle
 ├── docs/           # Documentation technique
 ├── tests/          # Tests du projet

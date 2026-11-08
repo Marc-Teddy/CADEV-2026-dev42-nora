@@ -3,12 +3,12 @@ name: Backend CI
 on:
   push:
     paths:
-      - 'backend/**'
+      - 'backend/api/**'
       - 'db/migrations/**'
       - '.github/workflows/backend-ci.yml'
   pull_request:
     paths:
-      - 'backend/**'
+      - 'backend/api/**'
       - 'db/migrations/**'
       - '.github/workflows/backend-ci.yml'
 
@@ -31,7 +31,7 @@ jobs:
           --health-retries 10
     defaults:
       run:
-        working-directory: backend
+        working-directory: backend/api
     env:
       NODE_ENV: test
       DATABASE_URL: postgres://nora:nora@localhost:5432/nora
@@ -44,7 +44,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: backend/api/package-lock.json
       - run: npm ci
       - run: |
           printf 'DATABASE_URL=%s\nJWT_ACCESS_SECRET=%s\nJWT_REFRESH_SECRET=%s\n' \

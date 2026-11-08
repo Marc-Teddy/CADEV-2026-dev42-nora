@@ -1,9 +1,9 @@
 # NORA backend
 
-API Fastify/Node.js 20 avec PostgreSQL. Les migrations sont dans `../db/migrations`.
+API Fastify/Node.js 20 avec PostgreSQL. Les migrations sont dans `../../db/migrations`.
 
 ```powershell
-Copy-Item ..\.env.example .env
+Copy-Item .env.example .env
 npm install
 npm run migrate:up
 npm run dev
@@ -12,7 +12,7 @@ npm run dev
 Pour Docker, le contexte de build est la racine du dépôt :
 
 ```powershell
-Copy-Item backend\.env.example backend\.env
+Copy-Item backend\api\.env.example backend\api\.env
 docker compose up --build -d
 ```
 

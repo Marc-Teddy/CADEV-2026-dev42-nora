@@ -1,0 +1,25 @@
+# Secrets et configuration locale
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+
+# Outils et OS
+.DS_Store
+.idea/
+.vscode/
+*.log

@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - backend/**
+      - backend/api/**
       - db/migrations/**
       - .github/workflows/container.yml
 
@@ -33,7 +33,7 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: .
-          file: backend/Dockerfile
+          file: backend/api/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

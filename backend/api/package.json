@@ -9,15 +9,15 @@
   "scripts": {
     "dev": "nodemon --exec \"node --env-file=.env\" --watch src --ext js src/index.js",
     "start": "node --env-file=.env src/index.js",
-    "migrate:up": "dotenv -e .env -- node-pg-migrate -m ../db/migrations up",
-    "migrate:down": "dotenv -e .env -- node-pg-migrate -m ../db/migrations down",
+    "migrate:up": "dotenv -e .env -- node-pg-migrate -m ../../db/migrations up",
+    "migrate:down": "dotenv -e .env -- node-pg-migrate -m ../../db/migrations down",
     "test": "node --test test/**/*.test.js",
     "test:unit": "node --test test/unit/*.test.js",
     "test:integration": "node --test test/integration/*.test.js",
     "lint": "eslint src test scripts",
     "check:env": "dotenv -e .env -- node scripts/check-env.mjs",
     "loadtest": "node scripts/loadtest.mjs",
-    "migrate:check": "dotenv -e .env -- node-pg-migrate -m ../db/migrations up --dry-run"
+    "migrate:check": "dotenv -e .env -- node-pg-migrate -m ../../db/migrations up --dry-run"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

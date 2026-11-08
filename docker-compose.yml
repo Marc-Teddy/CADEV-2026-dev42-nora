@@ -17,9 +17,9 @@ services:
   backend:
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: backend/api/Dockerfile
     env_file:
-      - ./backend/.env
+      - ./backend/api/.env
     depends_on:
       postgres:
         condition: service_healthy

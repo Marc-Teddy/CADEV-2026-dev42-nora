@@ -5,4 +5,4 @@ La stratégie de différenciation produit est détaillée dans
 [`docs/innovation.md`](docs/innovation.md).
 
 La qualité backend, les tests, les migrations et les tests de charge sont
-décrits dans [`backend/README.md`](backend/README.md).
+décrits dans [`backend/api/README.md`](backend/api/README.md).

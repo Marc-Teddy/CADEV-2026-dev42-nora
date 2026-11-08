@@ -240,12 +240,12 @@ d’intégration avant fusion vers `develop`.
 
 ## Outillage de validation
 
-- Tests Node natifs dans `backend/test/unit` et `backend/test/integration`.
+- Tests Node natifs dans `backend/api/test/unit` et `backend/api/test/integration`.
 - Vérification que chaque migration expose `up` et `down`.
 - Vérification de configuration avec `npm run check:env`.
 - Lint couvrant le code, les tests et les scripts.
 - Test de charge local configurable avec `npm run loadtest`.
-- Scénario k6 avec seuils d’erreur, p95 et p99 dans `backend/loadtest/smoke.js`.
+- Scénario k6 avec seuils d’erreur, p95 et p99 dans `backend/api/loadtest/smoke.js`.
 - Workflow CI GitHub avec PostgreSQL, migrations, lint et tests.
 - Workflow sécurité avec audit des dépendances et détection de secrets.
 - Workflow de validation rollback/réapplication des migrations.

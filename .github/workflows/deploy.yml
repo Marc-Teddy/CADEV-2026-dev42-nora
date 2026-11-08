@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Immutable image tag to deploy
+        required: true
+        type: string
+      environment:
+        description: Protected GitHub environment
+        required: true
+        default: production
+        type: environment
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Validate deployment inputs
+        run: |
+          test -n "${{ inputs.image_tag }}"
+          test "${{ inputs.image_tag }}" != "latest"
+      - name: Explain deployment contract
+        run: |
+          echo "Configure the protected environment's deployment command and secrets."
+          echo "The command must pull the immutable image, run migrations, health-check, then switch traffic."
+          echo "IMAGE_TAG=${{ inputs.image_tag }}"

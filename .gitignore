@@ -23,3 +23,15 @@ build/
 .idea/
 .vscode/
 *.log
+.env
+.env.*
+!.env.example
+node_modules/
+coverage/
+dist/
+*.log
+backend/api/.env
+backend/api/.env.*
+!backend/api/.env.example
+!backend/api/.env.test.example
+backend/api/loadtest/results/

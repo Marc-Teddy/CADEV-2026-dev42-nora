@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nora
+      POSTGRES_USER: nora
+      POSTGRES_PASSWORD: nora
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nora -d nora"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - nora-postgres:/var/lib/postgresql/data
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - ./backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+volumes:
+  nora-postgres:

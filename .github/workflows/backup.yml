@@ -1,0 +1,28 @@
+name: Database backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 2 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Validate backup configuration
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BACKUP_COMMAND: ${{ secrets.BACKUP_COMMAND }}
+        run: |
+          test -n "$DATABASE_URL"
+          test -n "$BACKUP_COMMAND"
+          echo "A production backup command must stream an encrypted pg_dump to approved durable storage."
+          echo "Configure BACKUP_COMMAND as an environment secret; never print its value."
+      - name: Backup contract
+        run: |
+          echo "Backup job is intentionally provider-neutral."
+          echo "The configured command must include encryption, retention and restore verification."

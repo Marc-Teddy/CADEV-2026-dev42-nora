@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+node_modules/
+coverage/
+dist/
+*.log
+backend/.env
+backend/.env.*
+!backend/.env.example
+!backend/.env.test.example
+backend/loadtest/results/

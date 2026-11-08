@@ -1,0 +1,50 @@
+name: Migration safety
+
+on:
+  pull_request:
+    paths:
+      - db/migrations/**
+      - backend/package*.json
+      - .github/workflows/migration-check.yml
+
+permissions:
+  contents: read
+
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: nora
+          POSTGRES_USER: nora
+          POSTGRES_PASSWORD: nora
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nora -d nora"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DATABASE_URL: postgres://nora:nora@localhost:5432/nora
+      JWT_ACCESS_SECRET: migration-access-secret-012345678901234567
+      JWT_REFRESH_SECRET: migration-refresh-secret-012345678901234567
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: |
+          printf 'DATABASE_URL=%s\nJWT_ACCESS_SECRET=%s\nJWT_REFRESH_SECRET=%s\n' \
+            "$DATABASE_URL" "$JWT_ACCESS_SECRET" "$JWT_REFRESH_SECRET" > .env
+      - run: npm run migrate:up
+      - run: npm run migrate:down
+      - run: npm run migrate:up

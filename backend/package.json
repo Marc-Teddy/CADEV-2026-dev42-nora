@@ -1,0 +1,44 @@
+{
+  "name": "nora-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "nodemon --exec \"node --env-file=.env\" --watch src --ext js src/index.js",
+    "start": "node --env-file=.env src/index.js",
+    "migrate:up": "dotenv -e .env -- node-pg-migrate -m ../db/migrations up",
+    "migrate:down": "dotenv -e .env -- node-pg-migrate -m ../db/migrations down",
+    "test": "node --test test/**/*.test.js",
+    "test:unit": "node --test test/unit/*.test.js",
+    "test:integration": "node --test test/integration/*.test.js",
+    "lint": "eslint src test scripts",
+    "check:env": "dotenv -e .env -- node scripts/check-env.mjs",
+    "loadtest": "node scripts/loadtest.mjs",
+    "migrate:check": "dotenv -e .env -- node-pg-migrate -m ../db/migrations up --dry-run"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.3.0",
+    "@fastify/helmet": "^13.1.1",
+    "@fastify/jwt": "^10.2.2",
+    "@fastify/rate-limit": "^11.2.0",
+    "@fastify/swagger": "^9.8.1",
+    "@fastify/swagger-ui": "^6.1.1",
+    "@fastify/websocket": "^11.2.0",
+    "argon2": "^0.41.1",
+    "fastify": "^5.12.1",
+    "fastify-raw-body": "^6.0.3",
+    "node-pg-migrate": "^8.0.3",
+    "nodemailer": "^10.4.0",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.9.1",
+    "nodemon": "^3.1.4"
+  }
+}

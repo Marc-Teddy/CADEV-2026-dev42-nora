@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/node_modules/monaco-editor/esm/vs/base/browser/ui/codicons/codicon/codicon-modifiers.css"],"sourcesContent":["/*---------------------------------------------------------------------------------------------\n *  Copyright (c) Microsoft Corporation. All rights reserved.\n *  Licensed under the MIT License. See License.txt in the project root for license information.\n *--------------------------------------------------------------------------------------------*/\n\n.codicon-wrench-subaction {\n\topacity: 0.5;\n}\n\n@keyframes codicon-spin {\n\t100% {\n\t\ttransform:rotate(360deg);\n\t}\n}\n\n.codicon-sync.codicon-modifier-spin,\n.codicon-loading.codicon-modifier-spin,\n.codicon-gear.codicon-modifier-spin,\n.codicon-notebook-state-executing.codicon-modifier-spin,\n.codicon-loading,\n.codicon-tree-item-loading::before {\n\t/* Use steps to throttle FPS to reduce CPU usage */\n\tanimation: codicon-spin 1.5s steps(30) infinite;\n\t/* Ensure rotation happens around exact center to prevent wobble */\n\ttransform-origin: center center;\n}\n\n.codicon-modifier-disabled {\n\topacity: 0.4;\n}\n"],"names":[],"mappings":"AAKA;;;;AAIA;;;;;;AAMA;;;;;AAYA","ignoreList":[0]}}]
-}

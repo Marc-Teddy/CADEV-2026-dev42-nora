@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///home/suspect90/CADEV-2026-dev42-nora/frontend/src/monaco-workers/json.worker.ts"],"sourcesContent":["/* Worker JSON (validation + formatage) */\nimport \"monaco-editor/language/json/json.worker\";\n"],"names":[],"mappings":";AAAA,wCAAwC,GACxC"}}]
-}

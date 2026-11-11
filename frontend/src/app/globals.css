@@ -4,11 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   NORA — Design system « Signal & Flare »
-   3 couleurs majeures :
-   · Noir chaud   #0B0D0A  (~85 % de la surface)
-   · Vert signal  #3DFF8B  (~10 %, accent dominant)
-   · Orange flare #FF6B1A  (~5 %, CTA / actifs / micro-détails)
+   NORA — Design system « Nuit Violette » (v2)
+   Base sombre bleutée ~85 %, violet néon ~10 % (CTA, actifs),
+   teal succès + cyan néon + or trophées en micro-détails (~5 %).
+   Déclinée en mode clair lavande. Logo : N « L'Ascension ».
    ============================================================ */
 
 @theme inline {
@@ -46,7 +45,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  /* NORA : les 3 couleurs majeures */
+  /* NORA : violet principal + teal succès + or & cyan micro-détails */
   --color-signal: var(--signal);
   --color-signal-muted: var(--signal-muted);
   --color-flare: var(--flare);
@@ -54,6 +53,8 @@
   --color-flare-deep: var(--flare-deep);
   --color-flare-soft: var(--flare-soft);
   --color-flare-foreground: var(--flare-foreground);
+  --color-gold: var(--gold);
+  --color-cyan-neon: var(--cyan-neon);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-line: var(--line);
@@ -63,108 +64,117 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* ---------- Thème clair (papier chaud) ---------- */
+/* ---------- Thème clair (gris tamisé, jamais blanc flash) ---------- */
 :root {
   --radius: 0.75rem;
 
-  --background: #f1f3ec;
-  --foreground: #13160f;
-  --card: #fbfcf7;
-  --card-foreground: #13160f;
-  --popover: #fbfcf7;
-  --popover-foreground: #13160f;
-  --primary: #0e8a48;
-  --primary-foreground: #f1f3ec;
-  --secondary: #e6ebdd;
-  --secondary-foreground: #13160f;
-  --muted: #e6ebdd;
-  --muted-foreground: #5d675a;
-  --accent: #e2e9d8;
-  --accent-foreground: #13160f;
-  --destructive: #d33d3d;
-  --border: rgba(19, 22, 15, 0.12);
-  --input: rgba(19, 22, 15, 0.16);
-  --ring: #0e8a48;
-  --chart-1: #0e8a48;
-  --chart-2: #ff6b1a;
-  --chart-3: #1f7a45;
-  --chart-4: #8a9484;
-  --chart-5: #c96a2e;
-  --sidebar: #f7f9f2;
-  --sidebar-foreground: #13160f;
-  --sidebar-primary: #0e8a48;
-  --sidebar-primary-foreground: #f1f3ec;
-  --sidebar-accent: #e6ebdd;
-  --sidebar-accent-foreground: #13160f;
-  --sidebar-border: rgba(19, 22, 15, 0.1);
-  --sidebar-ring: #0e8a48;
+  /* polices variables embarquées (@fontsource) */
+  --font-display: "Sora Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Les 3 couleurs majeures — variante claire */
-  --signal: #0e8a48;
-  --signal-muted: #1f7a45;
-  --flare: #e35405;
-  --flare-bright: #f26a1b;
-  --flare-deep: #b34508;
-  --flare-soft: rgba(227, 84, 5, 0.09);
-  --flare-foreground: #fff4ec;
-  --surface: #fbfcf7;
-  --surface-2: #e8ede0;
-  --line: rgba(19, 22, 15, 0.1);
-  --grid-line: rgba(19, 22, 15, 0.055);
-  --dot-line: rgba(19, 22, 15, 0.16);
-  --glow-signal: rgba(14, 138, 72, 0.22);
-  --glow-flare: rgba(227, 84, 5, 0.25);
+  --background: #ebebf0;
+  --foreground: #191430;
+  --card: #f4f4f7;
+  --card-foreground: #191430;
+  --popover: #f6f6f9;
+  --popover-foreground: #191430;
+  --primary: #6d28d9;
+  --primary-foreground: #ffffff;
+  --secondary: #e2e1ea;
+  --secondary-foreground: #191430;
+  --muted: #e2e1ea;
+  --muted-foreground: #5d5876;
+  --accent: #dcdbe6;
+  --accent-foreground: #191430;
+  --destructive: #d33d5c;
+  --border: rgba(25, 20, 48, 0.12);
+  --input: rgba(25, 20, 48, 0.16);
+  --ring: #6d28d9;
+  --chart-1: #6d28d9;
+  --chart-2: #0c9d77;
+  --chart-3: #0891b2;
+  --chart-4: #d97706;
+  --chart-5: #2563eb;
+  --sidebar: #f1f1f5;
+  --sidebar-foreground: #191430;
+  --sidebar-primary: #6d28d9;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e2e1ea;
+  --sidebar-accent-foreground: #191430;
+  --sidebar-border: rgba(25, 20, 48, 0.1);
+  --sidebar-ring: #6d28d9;
+
+  /* Couleurs majeures — variante claire */
+  --signal: #0c9d77;
+  --signal-muted: #067a5b;
+  --flare: #7c3aed;
+  --flare-bright: #8b5cf6;
+  --flare-deep: #5b21b6;
+  --flare-soft: rgba(124, 58, 237, 0.08);
+  --flare-foreground: #ffffff;
+  --gold: #d97706;
+  --cyan-neon: #0891b2;
+  --surface: #f4f4f7;
+  --surface-2: #e3e2eb;
+  --line: rgba(25, 20, 48, 0.1);
+  --grid-line: rgba(25, 20, 48, 0.055);
+  --dot-line: rgba(25, 20, 48, 0.14);
+  --glow-signal: rgba(12, 157, 119, 0.2);
+  --glow-flare: rgba(124, 58, 237, 0.2);
 }
 
-/* ---------- Thème sombre (nuit chaude) — défaut ---------- */
+/* ---------- Thème sombre (nuit violette) — défaut ---------- */
 .dark {
-  --background: #0b0d0a;
-  --foreground: #e8ede4;
-  --card: #12160f;
-  --card-foreground: #e8ede4;
-  --popover: #12160f;
-  --popover-foreground: #e8ede4;
-  --primary: #3dff8b;
-  --primary-foreground: #07130b;
-  --secondary: #1a1f16;
-  --secondary-foreground: #e8ede4;
-  --muted: #1a1f16;
-  --muted-foreground: #8a9484;
-  --accent: #1d2618;
-  --accent-foreground: #e8ede4;
-  --destructive: #e5484d;
-  --border: rgba(138, 148, 132, 0.16);
-  --input: rgba(138, 148, 132, 0.22);
-  --ring: #3dff8b;
-  --chart-1: #3dff8b;
-  --chart-2: #ff6b1a;
-  --chart-3: #1f7a45;
-  --chart-4: #8a9484;
-  --chart-5: #c96a2e;
-  --sidebar: #0e120c;
-  --sidebar-foreground: #e8ede4;
-  --sidebar-primary: #3dff8b;
-  --sidebar-primary-foreground: #07130b;
-  --sidebar-accent: #1a1f16;
-  --sidebar-accent-foreground: #e8ede4;
-  --sidebar-border: rgba(138, 148, 132, 0.14);
-  --sidebar-ring: #3dff8b;
+  --background: #0b0912;
+  --foreground: #efedf8;
+  --card: #141021;
+  --card-foreground: #efedf8;
+  --popover: #161225;
+  --popover-foreground: #efedf8;
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+  --secondary: #1c1631;
+  --secondary-foreground: #efedf8;
+  --muted: #1c1631;
+  --muted-foreground: #9d97b4;
+  --accent: #221a3a;
+  --accent-foreground: #efedf8;
+  --destructive: #f0546c;
+  --border: rgba(157, 151, 180, 0.16);
+  --input: rgba(157, 151, 180, 0.22);
+  --ring: #8b5cf6;
+  --chart-1: #8b5cf6;
+  --chart-2: #2dd4a0;
+  --chart-3: #22d3ee;
+  --chart-4: #f5a623;
+  --chart-5: #3b82f6;
+  --sidebar: #0e0b18;
+  --sidebar-foreground: #efedf8;
+  --sidebar-primary: #8b5cf6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1c1631;
+  --sidebar-accent-foreground: #efedf8;
+  --sidebar-border: rgba(157, 151, 180, 0.14);
+  --sidebar-ring: #8b5cf6;
 
-  /* Les 3 couleurs majeures — nuit */
-  --signal: #3dff8b;
-  --signal-muted: #1f7a45;
-  --flare: #ff6b1a;
-  --flare-bright: #ff9145;
-  --flare-deep: #d05112;
-  --flare-soft: rgba(255, 107, 26, 0.08);
-  --flare-foreground: #1a0d03;
-  --surface: #12160f;
-  --surface-2: #1a1f16;
-  --line: rgba(138, 148, 132, 0.16);
-  --grid-line: rgba(232, 237, 228, 0.045);
-  --dot-line: rgba(232, 237, 228, 0.12);
-  --glow-signal: rgba(61, 255, 139, 0.16);
-  --glow-flare: rgba(255, 107, 26, 0.2);
+  /* Couleurs majeures — nuit */
+  --signal: #2dd4a0;
+  --signal-muted: #0f9d77;
+  --flare: #8b5cf6;
+  --flare-bright: #a78bfa;
+  --flare-deep: #6d28d9;
+  --flare-soft: rgba(139, 92, 246, 0.1);
+  --flare-foreground: #ffffff;
+  --gold: #f5a623;
+  --cyan-neon: #22d3ee;
+  --surface: #141021;
+  --surface-2: #1c1631;
+  --line: rgba(157, 151, 180, 0.14);
+  --grid-line: rgba(239, 237, 248, 0.05);
+  --dot-line: rgba(239, 237, 248, 0.12);
+  --glow-signal: rgba(45, 212, 160, 0.16);
+  --glow-flare: rgba(139, 92, 246, 0.25);
 }
 
 @layer base {
@@ -175,10 +185,14 @@
     scroll-behavior: smooth;
     scrollbar-color: color-mix(in oklab, var(--muted-foreground) 45%, transparent) transparent;
     position: relative; /* requis par Lenis pour le calcul des offsets */
+    /* typographie plus large et plus lisible (v3) */
+    font-size: 17px;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans), system-ui, sans-serif;
     font-feature-settings: "ss01", "cv11";
+    letter-spacing: 0.005em;
     overflow-x: clip;
   }
   h1, h2, h3, h4 {
@@ -186,7 +200,7 @@
     text-wrap: balance;
   }
   ::selection {
-    background: color-mix(in oklab, var(--signal) 32%, transparent);
+    background: color-mix(in oklab, var(--flare) 38%, transparent);
     color: var(--foreground);
   }
   ::-webkit-scrollbar {
@@ -203,17 +217,11 @@
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in oklab, var(--signal) 55%, transparent);
+    background: color-mix(in oklab, var(--flare) 55%, transparent);
     background-clip: padding-box;
   }
-  /* Curseur personnalisé : on masque le natif seulement sur pointeur précis */
-  @media (pointer: fine) {
-    html.custom-cursor, html.custom-cursor * {
-      cursor: none !important;
-    }
-  }
   :focus-visible {
-    outline: 2px solid color-mix(in oklab, var(--signal) 70%, transparent);
+    outline: 2px solid color-mix(in oklab, var(--flare) 70%, transparent);
     outline-offset: 2px;
   }
 }
@@ -240,8 +248,15 @@
   }
 
   /* ---- Accents ---- */
+  /* Dégradé violet → bleu : titres signature et wordmark */
+  .text-gradient-flare {
+    background: linear-gradient(100deg, var(--flare-bright) 5%, var(--flare) 40%, color-mix(in oklab, var(--flare) 45%, var(--cyan-neon)) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
   .text-gradient-signal {
-    background: linear-gradient(100deg, var(--signal) 10%, color-mix(in oklab, var(--signal) 55%, #eafff2) 55%, var(--signal) 90%);
+    background: linear-gradient(100deg, var(--flare) 10%, color-mix(in oklab, var(--flare) 55%, #eef2ff) 55%, var(--flare) 90%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -252,10 +267,10 @@
   .glow-flare {
     box-shadow: 0 0 0 1px color-mix(in oklab, var(--flare) 30%, transparent), 0 10px 44px -12px var(--glow-flare);
   }
-  /* Dégradé orange riche pour les CTA clés : bright → deep.
+  /* Dégradé violet riche pour les CTA clés : bright → deep.
      Sélecteur doublé pour battre bg-primary des composants shadcn. */
   .flare-cta.flare-cta {
-    background: linear-gradient(135deg, var(--flare-bright) 0%, var(--flare) 42%, var(--flare-deep) 100%);
+    background: linear-gradient(135deg, var(--flare-bright) 0%, var(--flare) 45%, var(--flare-deep) 100%);
   }
   .flare-cta.flare-cta:hover {
     filter: brightness(1.08);
@@ -271,7 +286,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(140deg, color-mix(in oklab, var(--signal) 42%, transparent), transparent 42%, color-mix(in oklab, var(--flare) 26%, transparent) 95%);
+    background: linear-gradient(140deg, color-mix(in oklab, var(--flare) 45%, transparent), transparent 42%, color-mix(in oklab, var(--cyan-neon) 30%, transparent) 95%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -322,7 +337,7 @@
     inset: -1px;
     border-radius: inherit;
     padding: 1.5px;
-    background: conic-gradient(from var(--angle), transparent 12%, var(--signal) 22%, transparent 38%, transparent 62%, var(--flare) 72%, transparent 88%);
+    background: conic-gradient(from var(--angle), transparent 12%, var(--flare) 22%, transparent 38%, transparent 62%, var(--cyan-neon) 72%, transparent 88%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;

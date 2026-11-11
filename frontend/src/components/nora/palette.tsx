@@ -17,7 +17,7 @@ import { useLang } from "@/lib/i18n";
 import { useThemeSwitch } from "./shared";
 import {
   BadgeDollarSign, Code2, Cpu, Home, LayoutDashboard, LogIn, LogOut,
-  MessageSquare, Moon, Newspaper, Sun, Trophy, User, Users,
+  MessageSquare, Moon, Newspaper, SquareTerminal, Sun, Trophy, User, Users,
 } from "lucide-react";
 
 export function CommandPalette() {
@@ -71,6 +71,9 @@ export function CommandPalette() {
               <CommandItem onSelect={run(() => navigate("feed"))}>
                 <Newspaper className="size-4 text-signal" /> {t("app.feed")}
               </CommandItem>
+              <CommandItem onSelect={run(() => navigate("studio"))}>
+                <SquareTerminal className="size-4 text-flare" /> {t("app.studio")}
+              </CommandItem>
               <CommandItem onSelect={run(() => navigate("projects"))}>
                 <Code2 className="size-4 text-signal" /> {t("app.projects")}
               </CommandItem>
@@ -86,7 +89,7 @@ export function CommandPalette() {
               <CommandItem onSelect={run(() => navigate("missions"))}>
                 <BadgeDollarSign className="size-4 text-signal" /> {t("app.missions")}
               </CommandItem>
-              <CommandItem onSelect={run(() => navigate("profile"))}>
+              <CommandItem onSelect={run(() => useNora.getState().openMyProfile())}>
                 <User className="size-4 text-signal" /> {t("app.profile")}
               </CommandItem>
             </>
@@ -104,8 +107,8 @@ export function CommandPalette() {
             {lang === "fr" ? t("palette.lang") : t("palette.lang.fr")}
           </CommandItem>
           {!authed ? (
-            <CommandItem onSelect={run(() => { login(); toast.success(lang === "fr" ? "Connecté — mode démo" : "Signed in — demo mode"); })}>
-              <LogIn className="size-4 text-flare" /> {t("palette.demo")}
+            <CommandItem onSelect={run(() => navigate("login"))}>
+              <LogIn className="size-4 text-flare" /> {t("auth.login.title")}
             </CommandItem>
           ) : (
             <CommandItem onSelect={run(() => { logout(); navigate("landing"); })}>

@@ -9,7 +9,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Github, Mail, User } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,12 +71,15 @@ function AuthCard({
   subLink: string;
   fields: ("email" | "password" | "name" | "username" | "city")[];
   submit: string;
-  onSubmit: () => void;
+  onSubmit: (values: Record<string, string>) => Promise<void>;
   isRegister: boolean;
 }) {
   const { t, lang } = useLang();
   const { navigate } = useNora();
   const [loading, setLoading] = useState(false);
+  const [values, setValues] = useState<Record<string, string>>({});
+  const setValue = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setValues((v) => ({ ...v, [k]: e.target.value }));
 
   const labels: Record<string, string> = {
     email: t("auth.email"),
@@ -93,12 +96,16 @@ function AuthCard({
     city: <User className="size-3.5" />,
   };
 
-  const submit2 = () => {
+  const submit2 = async () => {
+    if (loading) return;
     setLoading(true);
-    setTimeout(() => {
-      onSubmit();
+    try {
+      await onSubmit(values);
+    } catch (err) {
+      toast.error(err instanceof Error && err.message ? err.message : lang === "fr" ? "Impossible de continuer" : "Could not continue");
+    } finally {
       setLoading(false);
-    }, 550);
+    }
   };
 
   return (
@@ -147,6 +154,9 @@ function AuthCard({
                   id={`f-${f}`}
                   type={f === "password" ? "password" : "text"}
                   required={f === "email" || f === "password"}
+                  value={values[f] ?? ""}
+                  onChange={setValue(f)}
+                  autoComplete={f === "password" ? (isRegister ? "new-password" : "current-password") : "off"}
                   className="h-11 rounded-lg border-line bg-surface pl-9 font-mono text-[13px] focus-visible:ring-signal/50"
                 />
               </div>
@@ -169,28 +179,14 @@ function AuthCard({
               )}
             </Button>
           </Magnetic>
-          <p className="text-center font-mono text-[10px] text-muted-foreground/60">{t("auth.hint")}</p>
         </form>
-
-        <div className="mt-8 flex items-center gap-3">
-          <span className="h-px flex-1 bg-line" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60">or</span>
-          <span className="h-px flex-1 bg-line" />
-        </div>
-        <Button
-          variant="outline"
-          onClick={() => { toast(lang === "fr" ? "OAuth GitHub — bientôt branché au backend Go" : "GitHub OAuth — Go backend hook coming soon"); }}
-          className="mt-6 h-11 w-full gap-2.5 rounded-lg border-line bg-surface font-mono text-[12px] hover:border-signal-muted/50"
-        >
-          <Github className="size-4" /> GitHub
-        </Button>
       </motion.div>
     </div>
   );
 }
 
 export function LoginPage() {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   const { login } = useNora();
   return (
     <main className="grid min-h-svh lg:grid-cols-2">
@@ -202,7 +198,7 @@ export function LoginPage() {
         subLink={t("auth.register.title")}
         fields={["email", "password"]}
         submit={t("auth.submitLogin")}
-        onSubmit={login}
+        onSubmit={async (v) => { await login(v.email ?? "", v.password ?? ""); }}
         isRegister={false}
       />
     </main>
@@ -210,8 +206,8 @@ export function LoginPage() {
 }
 
 export function RegisterPage() {
-  const { t, lang } = useLang();
-  const { login } = useNora();
+  const { t } = useLang();
+  const { register } = useNora();
   return (
     <main className="grid min-h-svh lg:grid-cols-2">
       <AuthSide />
@@ -222,7 +218,7 @@ export function RegisterPage() {
         subLink={t("auth.login.title")}
         fields={["name", "username", "email", "password", "city"]}
         submit={t("auth.submitRegister")}
-        onSubmit={login}
+        onSubmit={async (v) => { await register({ name: v.name ?? "", username: v.username ?? "", email: v.email ?? "", password: v.password ?? "", city: v.city ?? "" }); }}
         isRegister
       />
     </main>

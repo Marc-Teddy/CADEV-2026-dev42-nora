@@ -14,7 +14,8 @@ export type View =
   | "salons"
   | "challenges"
   | "missions"
-  | "profile";
+  | "profile"
+  | "studio";
 
 export type BadgeKind =
   | "mentor"
@@ -53,6 +54,7 @@ export interface Dev {
   challengesWon: number;
   langs: string[];
   joined: string;
+  avatarUrl?: string; // photo de profil téléversée (dataURL en démo)
 }
 
 export type ProjectStatus = "production" | "dev" | "equipe" | "idee";
@@ -73,6 +75,7 @@ export interface Project {
   progress: number;
   gradient: [string, string];
   icon: string; // emoji
+  cover?: string; // image de couverture (public/images)
   updated: string;
   repo: string;
 }
@@ -162,4 +165,45 @@ export interface Hackathon {
   teams: number;
   deadline: string;
   color: [string, string];
+}
+
+/* ---------- Studio de code ---------- */
+
+export interface WorkspaceFile {
+  id: string;
+  path: string;
+  content: string;
+  language: string;
+  updatedAt: string;
+}
+
+export type NotifKind = "contact" | "like" | "star" | "message";
+
+export interface NotifItem {
+  id: string;
+  kind: NotifKind;
+  from: string;
+  target?: string;
+  createdAtIso: string;
+}
+
+/* ---------- GitHub ---------- */
+
+export interface GithubRepo {
+  name: string;
+  fullName: string;
+  description: string;
+  language: string | null;
+  stars: number;
+  forks: number;
+  url: string;
+  updatedAtIso: string;
+  topics: string[];
+}
+
+export interface GithubUser {
+  login: string;
+  avatarUrl: string;
+  publicRepos: number;
+  bio: string;
 }

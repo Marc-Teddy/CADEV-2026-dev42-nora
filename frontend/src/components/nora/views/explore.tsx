@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useNora } from "@/lib/store";
 import { useLang } from "@/lib/i18n";
-import { projects, devs } from "@/lib/data";
 import { NoraAvatar, BadgePill, fmt } from "../shared";
 import { ViewHeader } from "../shell";
 import { EASE } from "../fx/reveal";
@@ -31,8 +30,22 @@ const statusStyle: Record<ProjectStatus, string> = {
 
 export function ProjectsView() {
   const { t, lang } = useLang();
-  const { viewProfile, joinedProjects, toggleJoin } = useNora();
+  const { viewProfile, toggleJoin, toggleStar, me } = useNora();
+  const projects = useNora((s) => s.projects);
+  const devs = useNora((s) => s.devs);
   const [filter, setFilter] = useState<ProjectStatus | "all">("all");
+  const [joinBusy, setJoinBusy] = useState<string | null>(null);
+
+  const doJoin = async (id: string, name: string) => {
+    setJoinBusy(id);
+    const before = projects.find((p) => p.id === id);
+    const wasJoined = Boolean(me && before?.team.includes(me.username));
+    await toggleJoin(id);
+    toast.success(wasJoined
+      ? (lang === "fr" ? `Tu as quitté ${name}` : `You left ${name}`)
+      : (lang === "fr" ? `Tu as rejoint ${name} — bienvenue dans l'équipe !` : `You joined ${name} — welcome aboard!`));
+    setJoinBusy(null);
+  };
 
   const list = projects.filter((p) => (filter === "all" ? true : p.status === filter));
   const filters: (ProjectStatus | "all")[] = ["all", "production", "dev", "equipe", "idee"];
@@ -58,28 +71,41 @@ export function ProjectsView() {
 
       <div className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-3">
         {list.map((p, i) => {
-          const joined = joinedProjects[p.id];
+          const joined = Boolean(me && p.team.includes(me.username));
           return (
             <motion.article
               key={p.id}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: Math.min(i * 0.04, 0.28), ease: EASE }}
-              className="hover-spot flex flex-col rounded-xl border border-line bg-surface p-5"
+              className="hover-spot group flex flex-col overflow-hidden rounded-xl border border-line bg-surface p-5"
             >
+              {p.cover ? (
+                <div className="relative -mx-5 -mt-5 mb-4 h-32 overflow-hidden">
+                  <img src={p.cover} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-surface/90 via-transparent to-transparent" />
+                  <span className={cn("absolute right-3 top-3 rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider backdrop-blur", statusStyle[p.status], "bg-[#0b0912]/70 text-white")}>
+                    {t(`projects.status.${p.status}`)}
+                  </span>
+                </div>
+              ) : null}
               <div className="flex items-start gap-3.5">
-                <span
-                  className="grid size-11 shrink-0 place-items-center rounded-xl text-xl"
-                  style={{ background: `linear-gradient(135deg, ${p.gradient[0]}22, ${p.gradient[1]}33)` }}
-                >
-                  {p.icon}
-                </span>
+                {!p.cover && (
+                  <span
+                    className="grid size-11 shrink-0 place-items-center rounded-xl text-xl"
+                    style={{ background: `linear-gradient(135deg, ${p.gradient[0]}22, ${p.gradient[1]}33)` }}
+                  >
+                    {p.icon}
+                  </span>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <h2 className="truncate font-display text-[15px] font-semibold">{p.name}</h2>
-                    <span className={cn("shrink-0 rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider", statusStyle[p.status])}>
-                      {t(`projects.status.${p.status}`)}
-                    </span>
+                    {!p.cover && (
+                      <span className={cn("shrink-0 rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider", statusStyle[p.status])}>
+                        {t(`projects.status.${p.status}`)}
+                      </span>
+                    )}
                   </div>
                   <p className="mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-muted-foreground">{p.tagline}</p>
                 </div>
@@ -134,12 +160,8 @@ export function ProjectsView() {
                   <Button
                     size="sm"
                     variant={joined ? "outline" : "default"}
-                    onClick={() => {
-                      toggleJoin(p.id);
-                      toast.success(joined
-                        ? (lang === "fr" ? "Quitté — à bientôt" : "Left — see you soon")
-                        : (lang === "fr" ? `Demande envoyée pour ${p.name}` : `Request sent for ${p.name}`));
-                    }}
+                    disabled={joinBusy === p.id}
+                    onClick={() => doJoin(p.id, p.name)}
                     className={cn(
                       "h-8 rounded-md px-3 font-mono text-[10.5px]",
                       joined ? "border-signal-muted/50 bg-transparent text-signal" : "bg-flare text-flare-foreground hover:bg-flare/90",
@@ -160,8 +182,23 @@ export function ProjectsView() {
 /* =========================== DEVS =========================== */
 
 export function DevsView() {
-  const { t, lang } = useLang();
-  const { viewProfile, followOverrides, toggleFollow } = useNora();
+  const { t } = useLang();
+  const { viewProfile, toggleFollow, dmRequests, requestContact, openDm, navigate } = useNora();
+  const devs = useNora((s) => s.devs);
+
+  /* contact : demande avec validation, ou discussion ouverte */
+  const contactAction = (username: string) => {
+    const state = dmRequests[username] ?? "none";
+    if (state === "accepted") {
+      openDm(username);
+      navigate("salons");
+      return;
+    }
+    if (state === "none") {
+      requestContact(username);
+      toast.success(t("msg.requestSentToast"));
+    }
+  };
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -169,7 +206,8 @@ export function DevsView() {
 
       <div className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-3">
         {devs.map((d, i) => {
-          const followed = followOverrides[d.username] ?? d.following;
+          const followed = d.following;
+          const contact = dmRequests[d.username] ?? "none";
           return (
             <motion.article
               key={d.username}
@@ -225,10 +263,14 @@ export function DevsView() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => toast(lang === "fr" ? `Salon privé avec ${d.name} — démo` : `Private room with ${d.name} — demo`)}
-                    className="h-8 rounded-md border-line px-3 font-mono text-[10.5px] hover:border-signal-muted/50 hover:text-signal"
+                    disabled={contact === "pending"}
+                    onClick={() => contactAction(d.username)}
+                    className={cn(
+                      "h-8 rounded-md border-line px-3 font-mono text-[10.5px] hover:border-flare/40 hover:text-flare",
+                      contact === "pending" && "text-muted-foreground",
+                    )}
                   >
-                    {t("devs.message")}
+                    {contact === "accepted" ? t("prof.openChat") : contact === "pending" ? t("msg.pending") : t("devs.message")}
                   </Button>
                 </div>
               </div>

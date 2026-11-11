@@ -84,7 +84,7 @@ function ProfilePreview() {
   return (
     <div className="@container flex h-full flex-col justify-between gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <NoraAvatar name="Vous" gradient={["#4dff9d", "#1f7a45"]} size={52} online />
+        <NoraAvatar name="Vous" gradient={["#34e3b5", "#0f9d77"]} size={52} online />
         <div className="min-w-0">
           <p className="truncate font-display text-sm font-semibold">@vous</p>
           <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">votre vitrine de code</p>
@@ -119,7 +119,7 @@ function ProfilePreview() {
 
 function EditorPreview() {
   return (
-    <div className="overflow-hidden rounded-lg border border-line bg-[#0d120c] font-mono text-[11.5px] leading-[1.8] dark:bg-[#0d120c]">
+    <div className="overflow-hidden rounded-lg border border-line bg-[#0d0a18] font-mono text-[11.5px] leading-[1.8] dark:bg-[#0d0a18]">
       <div className="flex items-center gap-2 border-b border-line px-3 py-1.5 text-[10px] text-muted-foreground">
         <Terminal className="size-3" /> api/handlers.go
         <span className="ml-auto flex items-center gap-1 text-signal"><Sparkles className="size-3" /> agent</span>
@@ -154,7 +154,12 @@ function SalonsPreview() {
 function HackathonPreview() {
   const items = ["salon", "dépôt git", "environnement"];
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
+      <div className="relative h-20 overflow-hidden rounded-lg border border-line">
+        <img src="/images/event-hackathon.jpg" alt="" loading="lazy" className="h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0b0912]/85 via-[#0b0912]/25 to-transparent" />
+        <span className="absolute bottom-1.5 left-2 font-mono text-[9px] uppercase tracking-[0.16em] text-white/85">Nuit du Code · Cotonou</span>
+      </div>
       <div className="inline-flex items-center gap-1.5 rounded-md bg-flare/15 px-2.5 py-1 font-mono text-[10px] text-flare">
         ⚡ 1 clic
       </div>
@@ -235,16 +240,26 @@ function MissionsPreview() {
 }
 
 function CitiesPreview() {
+  const photos = [
+    { city: "Cotonou", image: "/images/city-cotonou.jpg" },
+    { city: "Abidjan", image: "/images/city-abidjan.jpg" },
+    { city: "Dakar", image: "/images/city-dakar.jpg" },
+    { city: "Accra", image: "/images/city-accra.jpg" },
+  ];
   return (
-    <div className="flex flex-wrap content-center gap-1.5">
-      {["Abidjan", "Dakar", "Lagos", "Nairobi", "Kigali", "Douala"].map((c) => (
-        <span key={c} className="inline-flex items-center gap-1 rounded-full border border-line px-2.5 py-1 font-mono text-[10px] text-muted-foreground">
-          <MapPin className="size-2.5 text-signal" /> {c}
+    <div className="flex h-full flex-col justify-center gap-3">
+      <div className="flex flex-wrap gap-1.5">
+        {photos.map((c) => (
+          <span key={c.city} className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-2 py-1 pl-1 pr-2.5 font-mono text-[10px] text-foreground">
+            <img src={c.image} alt="" loading="lazy" className="size-5 rounded-full object-cover" />
+            {c.city}
+          </span>
+        ))}
+        <span className="inline-flex items-center gap-1 rounded-full border border-flare/30 bg-flare-soft px-2.5 py-1 font-mono text-[10px] text-flare">
+          <MapPin className="size-2.5" /> + votre ville
         </span>
-      ))}
-      <span className="inline-flex items-center gap-1 rounded-full border border-flare/30 bg-flare-soft px-2.5 py-1 font-mono text-[10px] text-flare">
-        <MapPin className="size-2.5" /> + votre ville
-      </span>
+      </div>
+      <p className="font-mono text-[10px] text-muted-foreground/70">meetups · mentorat · hackathons de quartier</p>
     </div>
   );
 }
@@ -326,26 +341,17 @@ export function BentoSection() {
             <BentoCard title={t("bento.profile.t")} desc={t("bento.profile.d")} className="sm:col-span-2 lg:row-span-2 lg:min-h-[320px]">
               <ProfilePreview />
             </BentoCard>
-            <BentoCard title={t("bento.editor.t")} desc={t("bento.editor.d")} className="sm:col-span-2">
+            <BentoCard title={t("bento.ai.t")} desc={t("bento.ai.d")} className="sm:col-span-2">
               <EditorPreview />
             </BentoCard>
             <BentoCard title={t("bento.salons.t")} desc={t("bento.salons.d")}>
               <SalonsPreview />
             </BentoCard>
-            <BentoCard title={t("bento.hackathon.t")} desc={t("bento.hackathon.d")} accent="flare">
-              <HackathonPreview />
-            </BentoCard>
             <BentoCard title={t("bento.challenges.t")} desc={t("bento.challenges.d")}>
               <ChallengesPreview />
             </BentoCard>
-            <BentoCard title={t("bento.missions.t")} desc={t("bento.missions.d")} accent="flare">
+            <BentoCard title={t("bento.missions.t")} desc={t("bento.missions.d")} className="sm:col-span-2 lg:col-span-4">
               <MissionsPreview />
-            </BentoCard>
-            <BentoCard title={t("bento.cities.t")} desc={t("bento.cities.d")}>
-              <CitiesPreview />
-            </BentoCard>
-            <BentoCard title={t("bento.reputation.t")} desc={t("bento.reputation.d")} className="sm:col-span-2">
-              <ReputationPreview />
             </BentoCard>
           </div>
         </Reveal>

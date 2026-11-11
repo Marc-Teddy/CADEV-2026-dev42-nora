@@ -74,7 +74,7 @@ export function DiffSection() {
 
           {/* panneau diff */}
           <Reveal delay={0.12}>
-            <div className="overflow-hidden rounded-xl border border-line bg-[#0d120c] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.75)] dark:bg-[#0d120c]">
+            <div className="overflow-hidden rounded-xl border border-line bg-[#0d0a18] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.75)] dark:bg-[#0d0a18]">
               <div className="flex items-center justify-between border-b border-line px-4 py-2.5 font-mono text-[11px]">
                 <span className="text-muted-foreground">auth/session.go</span>
                 <span className="flex gap-4">

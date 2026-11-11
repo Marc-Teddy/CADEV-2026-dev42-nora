@@ -11,14 +11,15 @@ import { motion } from "framer-motion";
 import { BadgeCheck, Banknote, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useNora } from "@/lib/store";
 import { useLang } from "@/lib/i18n";
-import { missions } from "@/lib/data";
 import { ViewHeader } from "../shell";
 import { EASE } from "../fx/reveal";
 import { cn } from "@/lib/utils";
 
 export function MissionsView() {
   const { t, lang } = useLang();
+  const missions = useNora((s) => s.missions);
   const [sent, setSent] = useState<Record<string, boolean>>({});
 
   return (

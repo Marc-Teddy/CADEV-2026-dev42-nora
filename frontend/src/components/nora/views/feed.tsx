@@ -14,9 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useNora } from "@/lib/store";
+import { useNora, devByUsername } from "@/lib/store";
 import { useLang } from "@/lib/i18n";
-import { posts as seedPosts, devByUsername } from "@/lib/data";
 import { NoraAvatar } from "../shared";
 import { ViewHeader } from "../shell";
 import { EASE } from "../fx/reveal";
@@ -34,31 +33,27 @@ const typeIcon: Record<string, React.ReactNode> = {
 
 export function FeedView() {
   const { t, lang } = useLang();
-  const { viewProfile, followOverrides, toggleFollow, likeOverrides, toggleLike } = useNora();
+  const { viewProfile, toggleFollow, toggleLike, createPost, me } = useNora();
+  const storePosts = useNora((s) => s.posts);
   const [tab, setTab] = useState<string>("all");
   const [draft, setDraft] = useState("");
-  const [extra, setExtra] = useState<Post[]>([]);
-  const me = devByUsername("theoah")!;
+  const [sending, setSending] = useState(false);
 
-  const all = [...extra, ...seedPosts].filter((p) => (tab === "all" ? true : p.type === tab));
+  const all = storePosts.filter((p) => (tab === "all" ? true : p.type === tab));
   const tabs = ["all", "projects", "code", "articles"];
 
-  const publish = () => {
-    if (!draft.trim()) return;
-    setExtra((prev) => [{
-      id: `local-${Date.now()}`,
-      author: me.username,
-      time: lang === "fr" ? "à l'instant" : "just now",
-      type: "text",
-      content: draft.trim(),
-      tags: [],
-      likes: 0,
-      comments: 0,
-      shares: 0,
-      liked: false,
-    }, ...prev]);
-    setDraft("");
-    toast.success(lang === "fr" ? "Publié dans le fil" : "Posted to the feed");
+  const publish = async () => {
+    if (!draft.trim() || !me || sending) return;
+    setSending(true);
+    try {
+      await createPost({ content: draft.trim(), type: "text" });
+      setDraft("");
+      toast.success(lang === "fr" ? "Publié dans le fil" : "Posted to the feed");
+    } catch {
+      toast.error(lang === "fr" ? "Publication impossible" : "Could not post");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -72,7 +67,7 @@ export function FeedView() {
         transition={{ duration: 0.45, ease: EASE }}
         className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3.5"
       >
-        <NoraAvatar name={me.name} gradient={me.gradient} size={38} />
+        <NoraAvatar name={me?.name ?? "?"} gradient={me?.gradient ?? ["#8b5cf6", "#22d3ee"]} size={38} />
         <Input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -104,9 +99,9 @@ export function FeedView() {
       {/* posts */}
       <div className="mt-4 space-y-3.5 pb-4">
         {all.map((p, i) => {
-          const author = devByUsername(p.author) ?? me;
-          const liked = likeOverrides[p.id] ?? p.liked;
-          const followed = followOverrides[p.author] ?? author.following;
+          const author = devByUsername(p.author) ?? me ?? { name: p.author, username: p.author, gradient: ["#8b5cf6", "#22d3ee"] as [string, string], following: false, online: false };
+          const liked = p.liked;
+          const followed = author.following;
           return (
             <motion.article
               key={p.id}
@@ -128,7 +123,7 @@ export function FeedView() {
                 <span className="flex items-center gap-1 rounded-full bg-surface-2 px-2.5 py-1 font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground">
                   {typeIcon[p.type]} {t(`feed.${p.type === "milestone" ? "projects" : p.type === "challenge" ? "code" : p.type}`)}
                 </span>
-                {p.author !== me.username && (
+                {p.author !== me?.username && (
                   <Button
                     size="sm"
                     variant={followed ? "outline" : "default"}
@@ -146,7 +141,7 @@ export function FeedView() {
               <p className="mt-3.5 whitespace-pre-line text-[14px] leading-relaxed text-foreground">{p.content}</p>
 
               {p.code && (
-                <div className="mt-3.5 overflow-hidden rounded-lg border border-line bg-[#0d120c] font-mono text-[11.5px] leading-[1.8] dark:bg-[#0d120c]">
+                <div className="mt-3.5 overflow-hidden rounded-lg border border-line bg-[#0d0a18] font-mono text-[11.5px] leading-[1.8] dark:bg-[#0d0a18]">
                   <div className="border-b border-line px-3 py-1.5 text-[10px] text-muted-foreground">{p.code.title}</div>
                   <pre className="overflow-x-auto px-3 py-2.5 text-signal/90">{p.code.snippet}</pre>
                 </div>
@@ -163,8 +158,8 @@ export function FeedView() {
               <div className="mt-4 flex items-center gap-1 border-t border-line pt-3">
                 {[
                   { icon: Heart, label: t("feed.like"), count: p.likes + (liked ? 1 : 0), active: liked, onClick: () => toggleLike(p.id) },
-                  { icon: MessageCircle, label: t("feed.comment"), count: p.comments, onClick: () => toast(lang === "fr" ? "Commentaires — démo" : "Comments — demo") },
-                  { icon: Share2, label: t("feed.share"), count: p.shares, onClick: () => toast(lang === "fr" ? "Lien copié" : "Link copied") },
+                  { icon: MessageCircle, label: t("feed.comment"), count: p.comments, onClick: () => toast(t("feed.comment.soon")) },
+                  { icon: Share2, label: t("feed.share"), count: p.shares, onClick: () => { navigator.clipboard?.writeText(`${window.location.origin}/feed#${p.id}`).catch(() => {}); toast.success(lang === "fr" ? "Lien copié ✓" : "Link copied ✓"); } },
                 ].map((a) => (
                   <button
                     key={a.label}

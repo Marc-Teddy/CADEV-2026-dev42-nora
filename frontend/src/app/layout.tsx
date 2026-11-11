@@ -1,28 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+/* polices variables embarquées (aucun appel réseau au build) */
+import "@fontsource-variable/sora";
+import "@fontsource-variable/manrope";
+import "@fontsource-variable/jetbrains-mono";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "@/lib/i18n";
-import { CustomCursor } from "@/components/nora/fx/cursor";
 import { SmoothScroll } from "@/components/nora/fx/lenis";
-
-const displayFont = Space_Grotesk({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const bodyFont = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
-const monoFont = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export const metadata: Metadata = {
   title: "NORA — La plateforme des développeurs africains",
@@ -37,6 +22,7 @@ export const metadata: Metadata = {
     "Mobile Money",
   ],
   authors: [{ name: "Équipe dev42" }],
+  icons: { icon: "/favicon.svg", apple: "/favicon.svg" },
   openGraph: {
     title: "NORA — La plateforme des développeurs africains",
     description:
@@ -47,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B0D0A",
+  themeColor: "#0B0912",
   width: "device-width",
   initialScale: 1,
 };
@@ -60,12 +46,11 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body
-        className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} antialiased bg-background text-foreground`}
+        className="antialiased bg-background text-foreground"
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
           <LanguageProvider>
             <SmoothScroll />
-            <CustomCursor />
             {children}
             <Toaster />
           </LanguageProvider>

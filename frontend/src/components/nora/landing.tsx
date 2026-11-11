@@ -12,11 +12,13 @@ import { Button } from "@/components/ui/button";
 import { useNora } from "@/lib/store";
 import { useLang } from "@/lib/i18n";
 import { Logo, WeaveStrip, ThemeToggle } from "@/components/nora/shared";
+import { api } from "@/lib/api-client";
 import { Magnetic } from "@/components/nora/fx/magnetic";
 import { EASE } from "@/components/nora/fx/reveal";
 import { cn } from "@/lib/utils";
 import { Hero } from "./landing/hero";
 import { AfricaSection } from "./landing/africa";
+import { ActivitySection } from "./landing/activity";
 import { BentoSection } from "./landing/bento";
 import { DiffSection, RoadmapSection, CtaSection } from "./landing/story";
 
@@ -82,7 +84,7 @@ function LandingNav() {
 
           {/* onglets de sections : pilule glissante + scroll-spy */}
           <nav
-            className="hidden items-center gap-0.5 rounded-full border border-line bg-surface/50 p-1 backdrop-blur-md md:flex"
+            className="hidden items-center gap-0.5 rounded-full border border-line bg-surface/50 p-1 backdrop-blur-md lg:flex"
             aria-label="Sections"
           >
             {SECTIONS.map((l) => {
@@ -155,10 +157,44 @@ function LandingNav() {
 }
 
 /* ============================ TICKER ============================ */
+/* chiffres réels de la plateforme + derniers projets publiés */
 function Ticker() {
   const { t } = useLang();
-  const items = ["ticker.1", "ticker.2", "ticker.3", "ticker.4", "ticker.5", "ticker.6", "ticker.7", "ticker.8"].map((k) => t(k));
-  const row = [...items, ...items];
+  const [items, setItems] = useState<string[]>([]);
+
+  useEffect(() => {
+    let alive = true;
+    Promise.all([api.stats(), api.projects()])
+      .then(([s, p]) => {
+        if (!alive) return;
+        const st = s.stats;
+        const base = [
+          `${st.devs} ${t("ticker.devs")}`,
+          `${st.projects} ${t("ticker.projects")}`,
+          `${st.posts} ${t("ticker.posts")}`,
+          `${st.countries} ${t("ticker.countries")}`,
+          `${st.channels} ${t("ticker.channels")}`,
+        ];
+        const proj = p.projects.slice(0, 5).map((x) => `${x.icon} ${x.name} · ★ ${x.stars}`);
+        setItems([...base, ...proj]);
+      })
+      .catch(() => undefined);
+    const id = setInterval(() => {
+      api.projects().then((p) => {
+        if (!alive) return;
+        setItems((cur) => {
+          const proj = p.projects.slice(0, 5).map((x) => `${x.icon} ${x.name} · ★ ${x.stars}`);
+          return cur.length ? [...cur.slice(0, 5), ...proj] : cur;
+        });
+      }).catch(() => undefined);
+    }, 30000);
+    return () => { alive = false; clearInterval(id); };
+  }, [t]);
+
+  /* repli sobre si l'API est inaccessible */
+  const fallback = ["ticker.1", "ticker.2", "ticker.3", "ticker.4", "ticker.5", "ticker.6", "ticker.7", "ticker.8"].map((k) => t(k));
+  const list = items.length ? items : fallback;
+  const row = [...list, ...list];
   return (
     <div className="relative border-y border-line bg-surface/60 py-3.5">
       <WeaveStrip className="absolute inset-x-0 top-0 opacity-60" />
@@ -254,6 +290,7 @@ export function LandingPage() {
       <Hero />
       <Ticker />
       <AfricaSection />
+      <ActivitySection />
       <BentoSection />
       <DiffSection />
       <RoadmapSection />

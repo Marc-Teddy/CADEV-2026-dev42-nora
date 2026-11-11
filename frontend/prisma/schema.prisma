@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// NORA — schéma de données réel (SQLite via Prisma)
+// Toutes les données de la plateforme vivent ici : plus de
+// constantes de démonstration dans le frontend.
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +11,221 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+/* ---------- Comptes & sessions ---------- */
+
+model Dev {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String    @unique
+  passwordHash  String
+  name          String
+  role          String    @default("Developer")
+  city          String    @default("")
+  country       String    @default("")
+  flag          String    @default("🌍")
+  bio           String    @default("")
+  skillsJson    String    @default("[]")
+  reputation    Int       @default(0)
+  badgesJson    String    @default("[]")
+  projectsCount Int       @default(0)
+  followers     Int       @default(0)
+  online        Boolean   @default(false)
+  availability  String    @default("ouverte")
+  gradientJson  String    @default("[\"#8b5cf6\",\"#22d3ee\"]")
+  articles      Int       @default(0)
+  challengesWon Int       @default(0)
+  langsJson     String    @default("[]")
+  joined        String    @default("")
+  avatarUrl     String?
+  githubJson    String    @default("{}") // { username } — intégration GitHub
+  createdAt     DateTime  @default(now())
+  sessions      Session[]
+  followingRel  Follow[]  @relation("follower")
+  followersRel  Follow[]  @relation("followee")
+  workspace     WorkspaceFile[]
 }
 
-model Post {
+/* Suivi entre devs (réel, pas de simulacre) */
+model Follow {
+  follower     String
+  followee     String
+  createdAt    DateTime @default(now())
+  followerDev  Dev @relation("follower", fields: [follower], references: [username], onDelete: Cascade)
+  followeeDev  Dev @relation("followee", fields: [followee], references: [username], onDelete: Cascade)
+
+  @@id([follower, followee])
+  @@index([followee])
+}
+
+/* ---------- Studio : fichiers de code par dev ---------- */
+
+model WorkspaceFile {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
+  owner     String
+  path      String // "src/main.js"
+  content   String   @default("")
+  language  String   @default("javascript")
   updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  dev       Dev      @relation(fields: [owner], references: [username], onDelete: Cascade)
+
+  @@unique([owner, path])
+}
+
+model Session {
+  id         String   @id // token opaque
+  dev        Dev      @relation(fields: [devUsername], references: [username], onDelete: Cascade)
+  devUsername String
+  createdAt  DateTime @default(now())
+}
+
+/* ---------- Projets ---------- */
+
+model Project {
+  id            String        @id @default(cuid())
+  name          String
+  tagline       String        @default("")
+  description   String        @default("")
+  domain        String        @default("Communautaire")
+  stackJson     String        @default("[]")
+  status        String        @default("dev")
+  starsBase     Int           @default(0)
+  forks         Int           @default(0)
+  owner         String
+  teamJson      String        @default("[]")
+  openRolesJson String        @default("[]")
+  progress      Int           @default(0)
+  gradientJson  String        @default("[\"#8b5cf6\",\"#22d3ee\"]")
+  icon          String        @default("🚀")
+  // rejoindre une équipe ajoute le dev dans teamJson (réel)
+  cover         String?
+  repo          String        @default("")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  starsGiven    ProjectStar[]
+}
+
+model ProjectStar {
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  username  String
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, username])
+}
+
+/* ---------- Fil d'actualité ---------- */
+
+model Post {
+  id          String     @id @default(cuid())
+  author      String
+  type        String     @default("text")
+  content     String
+  tagsJson    String     @default("[]")
+  likesBase   Int        @default(0)
+  comments    Int        @default(0)
+  shares      Int        @default(0)
+  codeLang    String?
+  codeTitle   String?
+  codeSnippet String?
+  projectId   String?
+  createdAt   DateTime   @default(now())
+  likedBy     PostLike[]
+}
+
+model PostLike {
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  username  String
+  createdAt DateTime @default(now())
+
+  @@unique([postId, username])
+}
+
+/* ---------- Salons publics ---------- */
+
+model Channel {
+  id       String           @id
+  name     String
+  kind     String           @default("text")
+  topic    String           @default("")
+  members  Int              @default(0)
+  order    Int              @default(0)
+  messages ChannelMessage[]
+}
+
+model ChannelMessage {
+  id         String   @id @default(cuid())
+  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channelId  String
+  author     String
+  content    String
+  kind       String   @default("text")
+  codeLang   String?
+  codeSnippet String?
+  createdAt  DateTime @default(now())
+}
+
+/* ---------- Messagerie privée (validation par le destinataire) ---------- */
+
+model ContactRequest {
+  id        String   @id @default(cuid())
+  from      String
+  to        String
+  status    String   @default("pending") // pending | accepted | declined
+  createdAt DateTime @default(now())
+
+  @@unique([from, to])
+}
+
+model DirectMessage {
+  id        String   @id @default(cuid())
+  threadKey String // "a|b" — usernames triés alphabétiquement
+  author    String
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([threadKey, createdAt])
+}
+
+/* ---------- Challenges, missions, hackathons ---------- */
+
+model Challenge {
+  id          String @id
+  title       String
+  description String @default("")
+  difficulty  String @default("Moyen")
+  language    String @default("Go")
+  by          String @default("NORA")
+  participants Int   @default(0)
+  endsIn      String @default("")
+  points      Int    @default(0)
+  successRate Int    @default(0)
+}
+
+model Mission {
+  id         String @id
+  title      String
+  client     String
+  city       String
+  flag       String @default("🌍")
+  budget     String
+  duration   String
+  skillsJson String @default("[]")
+  money      String @default("Wave")
+  urgency    String @default("Flexible")
+  match      Int    @default(0)
+}
+
+model Hackathon {
+  id       String @id
+  name     String
+  tagline  String @default("")
+  date     String
+  mode     String @default("En ligne")
+  place    String @default("")
+  prize    String @default("")
+  teams    Int    @default(0)
+  deadline String @default("")
+  colorJson String @default("[\"#7c3aed\",\"#3b82f6\"]")
 }

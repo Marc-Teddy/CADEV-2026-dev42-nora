@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///home/suspect90/CADEV-2026-dev42-nora/frontend/src/monaco-workers/editor.worker.ts"],"sourcesContent":["/* Workers Monaco (compilés comme entrées de worker par Turbopack) */\nimport \"monaco-editor/editor/editor.worker.js\";\n"],"names":[],"mappings":";AAAA,mEAAmE,GACnE"}}]
+}

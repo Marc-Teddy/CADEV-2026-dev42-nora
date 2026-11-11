@@ -1,0 +1,55 @@
+/* [project]/node_modules/monaco-editor/esm/vs/editor/contrib/rename/browser/renameWidget.css [app-client] (css) */
+.monaco-editor .rename-box {
+  z-index: 100;
+  color: inherit;
+  box-shadow: var(--vscode-shadow-lg);
+  border-radius: 4px;
+}
+
+.monaco-editor .rename-box.preview {
+  padding: 4px 4px 0;
+}
+
+.monaco-editor .rename-box .rename-input-with-button {
+  border-radius: 4px;
+  width: calc(100% - 8px);
+  padding: 3px;
+}
+
+.monaco-editor .rename-box .rename-input {
+  width: calc(100% - 8px);
+  padding: 0;
+}
+
+.monaco-editor .rename-box .rename-input:focus {
+  outline: none;
+}
+
+.monaco-editor .rename-box .rename-suggestions-button {
+  cursor: pointer;
+  background-color: #0000;
+  border: none;
+  border-radius: 5px;
+  align-items: center;
+  padding: 3px;
+  display: flex;
+}
+
+.monaco-editor .rename-box .rename-suggestions-button:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.monaco-editor .rename-box .rename-candidate-list-container .monaco-list-row {
+  border-radius: 2px;
+}
+
+.monaco-editor .rename-box .rename-label {
+  opacity: .8;
+  display: none;
+}
+
+.monaco-editor .rename-box.preview .rename-label {
+  display: inherit;
+}
+
+/*# sourceMappingURL=a9bf9_monaco-editor_esm_vs_editor_contrib_rename_browser_renameWidget_css_bad6b30c._.single.css.map*/

@@ -1,0 +1,18 @@
+/* [project]/node_modules/monaco-editor/esm/vs/editor/browser/viewParts/gpuMark/gpuMark.css [app-client] (css) */
+.monaco-editor .margin-view-overlays .gpu-mark {
+  border-left: solid 2px var(--vscode-editorWarning-foreground);
+  opacity: .2;
+  width: 100%;
+  transition: background-color .1s linear;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.monaco-editor .margin-view-overlays .gpu-mark:hover {
+  background-color: var(--vscode-editorWarning-foreground);
+}
+
+/*# sourceMappingURL=a9bf9_monaco-editor_esm_vs_editor_browser_viewParts_gpuMark_gpuMark_css_bad6b30c._.single.css.map*/

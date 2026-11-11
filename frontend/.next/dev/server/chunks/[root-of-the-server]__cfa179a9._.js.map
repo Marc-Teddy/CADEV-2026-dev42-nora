@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 46, "column": 0}, "map": {"version":3,"sources":["file:///home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts"],"sourcesContent":["import { PrismaClient } from '@prisma/client'\n\nconst globalForPrisma = globalThis as unknown as {\n  prisma: PrismaClient | undefined\n}\n\nexport const db =\n  globalForPrisma.prisma ??\n  new PrismaClient({\n    log: ['query'],\n  })\n\nif (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db"],"names":[],"mappings":";;;;AAAA;;AAEA,MAAM,kBAAkB;AAIjB,MAAM,KACX,gBAAgB,MAAM,IACtB,IAAI,sMAAY,CAAC;IACf,KAAK;QAAC;KAAQ;AAChB;AAEF,wCAA2C,gBAAgB,MAAM,GAAG"}},
+    {"offset": {"line": 63, "column": 0}, "map": {"version":3,"sources":["file:///home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/channels/route.ts"],"sourcesContent":["import { NextResponse } from \"next/server\";\nimport { db } from \"@/lib/db\";\n\nexport async function GET() {\n  const rows = await db.channel.findMany({ orderBy: { order: \"asc\" } });\n  return NextResponse.json({ channels: rows });\n}\n"],"names":[],"mappings":";;;;AAAA;AACA;;;AAEO,eAAe;IACpB,MAAM,OAAO,MAAM,wHAAE,CAAC,OAAO,CAAC,QAAQ,CAAC;QAAE,SAAS;YAAE,OAAO;QAAM;IAAE;IACnE,OAAO,gJAAY,CAAC,IAAI,CAAC;QAAE,UAAU;IAAK;AAC5C"}}]
+}

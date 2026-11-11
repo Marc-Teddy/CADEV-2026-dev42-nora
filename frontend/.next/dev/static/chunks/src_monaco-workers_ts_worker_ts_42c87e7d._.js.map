@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///home/suspect90/CADEV-2026-dev42-nora/frontend/src/monaco-workers/ts.worker.ts"],"sourcesContent":["/* Worker TypeScript/JavaScript pour l'autocomplétion réelle */\nimport \"monaco-editor/language/typescript/ts.worker\";\n"],"names":[],"mappings":";AAAA,6DAA6D,GAC7D"}}]
+}

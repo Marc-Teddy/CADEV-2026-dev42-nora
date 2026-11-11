@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/node_modules/monaco-editor/esm/vs/editor/browser/viewParts/gpuMark/gpuMark.css"],"sourcesContent":["/*---------------------------------------------------------------------------------------------\n *  Copyright (c) Microsoft Corporation. All rights reserved.\n *  Licensed under the MIT License. See License.txt in the project root for license information.\n *--------------------------------------------------------------------------------------------*/\n\n.monaco-editor .margin-view-overlays .gpu-mark {\n\tposition: absolute;\n\ttop: 0;\n\tbottom: 0;\n\tleft: 0;\n\twidth: 100%;\n\tdisplay: inline-block;\n\tborder-left: solid 2px var(--vscode-editorWarning-foreground);\n\topacity: 0.2;\n\ttransition: background-color 0.1s linear;\n}\n\n.monaco-editor .margin-view-overlays .gpu-mark:hover {\n\tbackground-color: var(--vscode-editorWarning-foreground)\n}\n"],"names":[],"mappings":"AAKA;;;;;;;;;;;;AAYA","ignoreList":[0]}}]
+}

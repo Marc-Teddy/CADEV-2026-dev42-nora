@@ -1,0 +1,8 @@
+/* [project]/node_modules/monaco-editor/esm/vs/editor/browser/viewParts/wordWrapIndicator/wordWrapIndicator.css [app-client] (css) */
+.monaco-editor .wwi {
+  pointer-events: none;
+  color: var(--vscode-editorWordWrapIndicator-foreground);
+  position: absolute;
+}
+
+/*# sourceMappingURL=5a7c4_vs_editor_browser_viewParts_wordWrapIndicator_wordWrapIndicator_css_bad6b30c._.single.css.map*/

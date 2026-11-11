@@ -1,0 +1,12 @@
+/* [project]/node_modules/monaco-editor/esm/vs/editor/contrib/placeholderText/browser/placeholderText.css [app-client] (css) */
+.monaco-editor .editorPlaceholder {
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  pointer-events: none;
+  color: var(--vscode-editor-placeholder-foreground);
+  position: absolute;
+  top: 0;
+  overflow: hidden;
+}
+
+/*# sourceMappingURL=4e583_esm_vs_editor_contrib_placeholderText_browser_placeholderText_css_bad6b30c._.single.css.map*/

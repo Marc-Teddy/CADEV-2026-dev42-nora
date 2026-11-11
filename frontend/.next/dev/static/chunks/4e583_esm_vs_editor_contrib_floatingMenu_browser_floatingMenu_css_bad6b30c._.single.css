@@ -1,0 +1,83 @@
+/* [project]/node_modules/monaco-editor/esm/vs/editor/contrib/floatingMenu/browser/floatingMenu.css [app-client] (css) */
+.floating-menu-overlay-widget {
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-editorWidget-background);
+  border-radius: var(--vscode-cornerRadius-medium);
+  border: 1px solid var(--vscode-contrastBorder);
+  z-index: 10;
+  box-shadow: var(--vscode-shadow-lg);
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  display: flex;
+  overflow: hidden;
+}
+
+.floating-menu-overlay-widget.single-button {
+  background-color: #0000;
+  border-width: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.floating-menu-overlay-widget.single-button .action-item > .action-label, .floating-menu-overlay-widget.single-button .action-item > .action-label.codicon:not(.separator) {
+  border-radius: var(--vscode-cornerRadius-medium);
+  height: 28px;
+  box-shadow: 0 2px 8px var(--vscode-widget-shadow);
+  line-height: 28px;
+}
+
+.floating-menu-overlay-widget.single-button .action-item > .action-label {
+  padding: 0 8px;
+}
+
+.floating-menu-overlay-widget.single-button .action-item > .action-label.codicon:not(.separator) {
+  width: 28px;
+}
+
+.floating-menu-overlay-widget .actions-container {
+  gap: 4px;
+}
+
+.floating-menu-overlay-widget .action-item > .action-label {
+  border-radius: var(--vscode-cornerRadius-small);
+  padding: 4px 6px;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.floating-menu-overlay-widget .action-item > .action-label.codicon:not(.separator) {
+  color: var(--vscode-foreground);
+  justify-content: center;
+  align-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 22px;
+  display: flex;
+}
+
+.floating-menu-overlay-widget .action-item.primary > .action-label, .floating-menu-overlay-widget .action-item.primary > .action-label.action-label.codicon:not(.separator) {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.floating-menu-overlay-widget .action-item.primary > .action-label:hover {
+  background-color: var(--vscode-button-hoverBackground) !important;
+}
+
+.hc-black .floating-menu-overlay-widget.single-button, .hc-light .floating-menu-overlay-widget.single-button {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--vscode-contrastBorder);
+  background-color: var(--vscode-editorWidget-background);
+  padding: 0;
+}
+
+:is(.hc-black .floating-menu-overlay-widget.single-button, .hc-light .floating-menu-overlay-widget.single-button) .action-item > .action-label, :is(.hc-black .floating-menu-overlay-widget.single-button, .hc-light .floating-menu-overlay-widget.single-button) .action-item > .action-label.codicon:not(.separator) {
+  box-shadow: none;
+}
+
+/*# sourceMappingURL=4e583_esm_vs_editor_contrib_floatingMenu_browser_floatingMenu_css_bad6b30c._.single.css.map*/

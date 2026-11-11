@@ -1,0 +1,11 @@
+{
+  "/api/challenges/route": "app/api/challenges/route.js",
+  "/api/channels/route": "app/api/channels/route.js",
+  "/api/devs/route": "app/api/devs/route.js",
+  "/api/hackathons/route": "app/api/hackathons/route.js",
+  "/api/missions/route": "app/api/missions/route.js",
+  "/api/posts/route": "app/api/posts/route.js",
+  "/api/projects/route": "app/api/projects/route.js",
+  "/api/stats/route": "app/api/stats/route.js",
+  "/page": "app/page.js"
+}

@@ -1,0 +1,218 @@
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.19.0.1:3000
+
+✓ Starting...
+✓ Ready in 1231ms
+○ Compiling / ...
+ GET / 200 in 1182ms (compile: 775ms, render: 407ms)
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/devs'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/channels'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/projects'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/challenges'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/posts'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/missions'
+}
+ GET /api/challenges 500 in 2.0s (compile: 1585ms, render: 454ms)
+ GET /api/posts 500 in 2.0s (compile: 1749ms, render: 293ms)
+ GET /api/devs 500 in 2.0s (compile: 1813ms, render: 234ms)
+ GET /api/channels 500 in 2.0s (compile: 1927ms, render: 117ms)
+ GET /api/projects 500 in 2.0s (compile: 1867ms, render: 175ms)
+ GET /api/missions 500 in 2.0s (compile: 1981ms, render: 59ms)
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/posts'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/devs'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/projects'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/stats'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/hackathons'
+}
+ GET /api/posts 500 in 466ms (compile: 126ms, render: 340ms)
+ GET /api/devs 500 in 465ms (compile: 198ms, render: 267ms)
+ GET /api/projects 500 in 464ms (compile: 264ms, render: 201ms)
+ GET /api/stats 500 in 536ms (compile: 402ms, render: 134ms)
+ GET /api/hackathons 500 in 538ms (compile: 472ms, render: 66ms)
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/projects'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/stats'
+}
+ GET /api/projects 500 in 165ms (compile: 40ms, render: 125ms)
+ GET /api/stats 500 in 164ms (compile: 103ms, render: 62ms)
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/projects'
+}
+⨯ Error: Failed to load external module @prisma/client-2c3a283f134fdcb6: ResolveMessage: Cannot find module '@prisma/client-2c3a283f134fdcb6' from '/home/suspect90/CADEV-2026-dev42-nora/frontend/.next/dev/server/chunks/[root-of-the-server]__1f64b4dc._.js'
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/lib/db.ts:1:1)
+    at module evaluation (file:/home/suspect90/CADEV-2026-dev42-nora/frontend/src/app/api/devs/route.ts:2:1)
+    at <anonymous> (.next/dev/server/app/api/devs/route.js:5:3)
+    at anonymous (null)
+    at processTicksAndRejections (null)
+> 1 | import { PrismaClient } from '@prisma/client'
+    | ^
+  2 |
+  3 | const globalForPrisma = globalThis as unknown as {
+  4 |   prisma: PrismaClient | undefined {
+  page: '/api/stats'
+}
+ GET /api/projects 500 in 266ms (compile: 142ms, render: 125ms)
+ GET /api/stats 500 in 266ms (compile: 204ms, render: 62ms)

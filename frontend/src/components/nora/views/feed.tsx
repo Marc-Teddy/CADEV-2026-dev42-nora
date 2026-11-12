@@ -157,7 +157,7 @@ export function FeedView() {
 
               <div className="mt-4 flex items-center gap-1 border-t border-line pt-3">
                 {[
-                  { icon: Heart, label: t("feed.like"), count: p.likes + (liked ? 1 : 0), active: liked, onClick: () => toggleLike(p.id) },
+                  { icon: Heart, label: t("feed.like"), count: p.likes, active: liked, onClick: () => toggleLike(p.id) },
                   { icon: MessageCircle, label: t("feed.comment"), count: p.comments, onClick: () => toast(t("feed.comment.soon")) },
                   { icon: Share2, label: t("feed.share"), count: p.shares, onClick: () => { navigator.clipboard?.writeText(`${window.location.origin}/feed#${p.id}`).catch(() => {}); toast.success(lang === "fr" ? "Lien copié ✓" : "Link copied ✓"); } },
                 ].map((a) => (

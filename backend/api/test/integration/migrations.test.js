@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 const migrationsDirectory = join(dirname(fileURLToPath(import.meta.url)), '../../../../db/migrations');
 
 test('all migrations expose reversible up and down functions', async () => {
-  for (const file of ['001_initial.js', '002_collaboration.js', '003_platform.js', '004_mentorship.js', '005_extensibility.js']) {
+  for (const file of ['001_initial.js', '002_collaboration.js', '003_platform.js', '004_mentorship.js', '005_extensibility.js', '006_email_verification.js', '007_app_contract.js', '008_participation.js']) {
     const migration = await import(`${migrationsDirectory}/${file}`);
     assert.equal(typeof migration.up, 'function');
     assert.equal(typeof migration.down, 'function');

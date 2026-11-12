@@ -8,7 +8,7 @@
 #      ./nora.sh --prod       → idem, frontend en build de production
 #      ./nora.sh stop         → arrête tous les services
 #      ./nora.sh status       → état de chaque service
-#      ./nora.sh reset-db     → réinitialise + re-seed la base frontend
+#      ./nora.sh reset-db     → réinitialise + re-seed les bases (SQLite + Postgres)
 #      ./nora.sh logs         → suit les logs des services
 #
 #  Services :
@@ -100,10 +100,42 @@ start_postgres() {
 }
 
 # ============================================================
+#  ai-service/.env — créé avant le backend, qui en lit la clé
+#  interne (AI_SERVICE_KEY) pour appeler le service IA
+# ============================================================
+ensure_ai_env() {
+  local f="$ROOT/ai-service/.env"
+  [ -f "$f" ] && return 0
+  local key="${NORA_LLM_API_KEY:-}" base="${NORA_LLM_BASE_URL:-https://api.deepseek.com/v1}" model="${NORA_LLM_MODEL:-deepseek-coder}"
+  # pas de clé fournie mais Ollama tourne en local → IA gratuite, hors ligne
+  if [ -z "$key" ] && curl -sf -o /dev/null http://localhost:11434/api/tags; then
+    key="ollama"; base="http://localhost:11434/v1"; model="${NORA_OLLAMA_MODEL:-qwen2.5:3b}"
+    say "Ollama détecté : l'IA utilisera le modèle local $model (ollama pull $model s'il manque)"
+  fi
+  {
+    echo "# Fournisseur LLM compatible OpenAI (DeepSeek, OpenAI, Groq… ou Ollama en local)."
+    echo "# Sans clé : le service démarre, mais les endpoints /v1/* échoueront."
+    echo "LLM_API_KEY=$key"
+    echo "LLM_BASE_URL=$base"
+    echo "LLM_MODEL=$model"
+    echo "LLM_TIMEOUT_SECONDS=170"
+    echo "LLM_MAX_TOKENS=512"
+    echo "INTERNAL_API_KEY=$(rand_hex)"
+  } > "$f"
+  ok "ai-service/.env généré"
+}
+
+# ajoute KEY=VAL à un .env si la clé n'y figure pas encore
+ensure_env_key() { # $1=fichier $2=clé $3=valeur
+  grep -q "^$2=" "$1" 2>/dev/null || printf '%s=%s\n' "$2" "$3" >> "$1"
+}
+
+# ============================================================
 #  BACKEND :8080 (Fastify)
 # ============================================================
 start_backend() {
   cd "$ROOT/backend/api" || die "backend/api introuvable"
+  ensure_ai_env
   if port_open 8080 && curl -sf http://localhost:8080/health >/dev/null; then
     ok "Backend déjà en marche sur :8080"; cd "$ROOT"; return 0
   fi
@@ -113,7 +145,7 @@ start_backend() {
     local A; A="$(rand_hex)"; local B; B="$(rand_hex)"
     sed -i.bak -e "s|JWT_ACCESS_SECRET=.*|JWT_ACCESS_SECRET=$A|" \
                -e "s|JWT_REFRESH_SECRET=.*|JWT_REFRESH_SECRET=$B|" \
-               -e "s|CORS_ORIGIN=.*|CORS_ORIGIN=http://localhost:3000|" .env && rm -f .env.bak
+               -e "s|CORS_ORIGIN=.*|CORS_ORIGIN=http://localhost:3000,http://127.0.0.1:3000|" .env && rm -f .env.bak
     ok "backend/api/.env généré"
   }
   [ -d node_modules ] || {
@@ -122,17 +154,24 @@ start_backend() {
       || die "npm install backend a échoué (voir logs/backend-install.log)"
     ok "Dépendances backend installées"
   }
+  # liaison avec le service IA (clé interne partagée)
+  ensure_env_key .env AI_SERVICE_URL http://localhost:8000
+  ensure_env_key .env AI_SERVICE_KEY "$(grep '^INTERNAL_API_KEY=' "$ROOT/ai-service/.env" | cut -d= -f2-)"
   say "Migrations backend (node-pg-migrate)…"
   # load_env : le .env écrase toute variable héritée du shell (déterministe)
   load_env .env
   npx node-pg-migrate -m ../../db/migrations up >>"$LOGS/backend.log" 2>&1 \
     || die "Migrations backend échouées (voir logs/backend.log)"
   ok "Base Postgres à jour"
+  # peuple la communauté de démo si la base est vide (sans effet sinon)
+  node --env-file=.env --no-warnings scripts/seed.mjs >>"$LOGS/backend.log" 2>&1 \
+    || die "Seed backend échoué (voir logs/backend.log)"
+  ok "Données de démo Postgres prêtes"
   say "Démarrage du backend :8080…"
   nohup node src/index.js >>"$LOGS/backend.log" 2>&1 &
   echo $! > "$RUN/backend.pid"
   wait_url http://localhost:8080/health "backend" 45 || die "Backend ne répond pas (voir logs/backend.log)"
-  ok "Backend en marche → http://localhost:8080 (docs : /documentation)"
+  ok "Backend en marche → http://localhost:8080 (docs : /docs)"
   cd "$ROOT"
 }
 
@@ -151,17 +190,7 @@ start_ai() {
   }
   say "Installation des dépendances du service IA…"
   .venv/bin/pip install -q -r requirements.txt || die "pip install ai-service échoué"
-  [ -f .env ] || {
-    {
-      echo "# Clé du fournisseur LLM compatible OpenAI (DeepSeek par défaut)."
-      echo "# Sans clé : le service démarre, mais les endpoints /v1/* échoueront."
-      echo "LLM_API_KEY=${NORA_LLM_API_KEY:-}"
-      echo "LLM_BASE_URL=${NORA_LLM_BASE_URL:-https://api.deepseek.com/v1}"
-      echo "LLM_MODEL=${NORA_LLM_MODEL:-deepseek-coder}"
-      echo "INTERNAL_API_KEY=$(rand_hex)"
-    } > .env
-    ok "ai-service/.env généré"
-  }
+  ensure_ai_env
   [ -n "${NORA_LLM_API_KEY:-}" ] || grep -q "^LLM_API_KEY=..*" .env || \
     warn "LLM_API_KEY vide — complète ai-service/.env pour activer l'IA"
   say "Démarrage du service IA :8000…"
@@ -183,7 +212,12 @@ start_frontend() {
   fi
   has_cmd bun || die "bun introuvable — installe-le : curl -fsSL https://bun.sh/install | bash"
   mkdir -p db
-  [ -f .env ] || { cp .env.example .env; ok "frontend/.env créé (SQLite locale)"; }
+  [ -f .env ] || { cp .env.example .env; ok "frontend/.env créé"; }
+  # interface branchée sur le backend Fastify (proxy /backend → :8080)
+  if ! grep -q '^NEXT_PUBLIC_API_URL=' .env && ! grep -q '^# *NEXT_PUBLIC_API_URL=' .env; then
+    printf '\n# Backend Fastify (voir .env.example)\nNEXT_PUBLIC_API_URL=/backend/api/v1/app\nBACKEND_URL=http://localhost:8080\n' >> .env
+    ok "frontend/.env : interface branchée sur le backend (:8080)"
+  fi
   load_env .env   # le .env prime sur tout DATABASE_URL hérité du shell
   [ -d node_modules ] || {
     say "Installation des dépendances frontend (bun install, 1-2 min)…"
@@ -224,7 +258,7 @@ start_frontend() {
 summary() {
   printf "\n${B}${G}  NORA est prête — équipe dev42 ${N}${G}🚀${N}\n\n"
   printf "  ${B}Frontend${N}    http://localhost:3000\n"
-  printf "  ${B}Backend${N}     http://localhost:8080  (health : /health, docs : /documentation)\n"
+  printf "  ${B}Backend${N}     http://localhost:8080  (health : /health, docs : /docs)\n"
   printf "  ${B}Service IA${N}  http://localhost:8000  (health : /health)\n\n"
   printf "  ${B}Compte de démo${N}  theoah@nora.africa / nora-dev42 (devs seedés, même mot de passe)\n"
   printf "  ${B}Logs${N}            logs/backend.log · logs/ai.log · logs/frontend.log\n"
@@ -307,8 +341,9 @@ cmd_reset_db() {
   ok "Base frontend réinitialisée et re-peuplée"
   say "Migrations backend (Postgres)…"
   (cd "$ROOT/backend/api" && load_env .env && \
-     npx node-pg-migrate -m ../../db/migrations up >>"$LOGS/backend.log" 2>&1) \
-     && ok "Migrations backend à jour"
+     npx node-pg-migrate -m ../../db/migrations up >>"$LOGS/backend.log" 2>&1 && \
+     node --env-file=.env --no-warnings scripts/seed.mjs --reset >>"$LOGS/backend.log" 2>&1) \
+     && ok "Base Postgres à jour, vidée et re-peuplée"
   cd "$ROOT"
 }
 

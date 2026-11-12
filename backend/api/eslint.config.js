@@ -9,7 +9,8 @@ export default [
       sourceType: 'module',
       globals: {
         URLSearchParams: 'readonly', fetch: 'readonly', process: 'readonly', Buffer: 'readonly',
-        console: 'readonly', performance: 'readonly', setTimeout: 'readonly', clearTimeout: 'readonly'
+        console: 'readonly', performance: 'readonly', setTimeout: 'readonly', clearTimeout: 'readonly',
+        AbortSignal: 'readonly'
       }
     },
     rules: { 'no-unused-vars': ['error', { argsIgnorePattern: '^_' }] }

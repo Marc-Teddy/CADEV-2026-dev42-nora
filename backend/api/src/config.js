@@ -12,11 +12,19 @@ export function loadConfig() {
   if (accessSecret.length < 32 || refreshSecret.length < 32 || accessSecret === refreshSecret) {
     throw new Error('JWT secrets must be distinct and at least 32 characters long');
   }
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
+  const smtpConfigured = Boolean(process.env.SMTP_HOST && process.env.SMTP_FROM);
+  const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173').split(',').map((origin) => origin.trim()).filter(Boolean);
+  // En développement sans SMTP, les comptes sont validés d'office : sinon personne ne peut s'inscrire.
+  // Jamais en production, quelle que soit la variable.
+  const autoVerifyEmail = nodeEnv !== 'production'
+    && (process.env.EMAIL_AUTO_VERIFY === 'true' || (process.env.EMAIL_AUTO_VERIFY !== 'false' && !smtpConfigured));
   return {
-    nodeEnv: process.env.NODE_ENV ?? 'development',
+    nodeEnv,
     host: process.env.HOST ?? '0.0.0.0',
     port: Number(process.env.PORT ?? 8080),
-    corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+    corsOrigin: corsOrigins[0],
+    corsOrigins,
     databaseUrl: required('DATABASE_URL'),
     poolMax: Number(process.env.DATABASE_POOL_MAX ?? 10),
     accessSecret,
@@ -37,6 +45,11 @@ export function loadConfig() {
     smtpPassword: process.env.SMTP_PASSWORD,
     smtpFrom: process.env.SMTP_FROM,
     emailVerificationUrl: process.env.EMAIL_VERIFICATION_URL ?? 'http://localhost:5173/verify-email',
-    emailVerificationTtl: process.env.EMAIL_VERIFICATION_TTL ?? '24 hours'
+    emailVerificationTtl: process.env.EMAIL_VERIFICATION_TTL ?? '24 hours',
+    autoVerifyEmail,
+    aiServiceUrl: process.env.AI_SERVICE_URL ?? 'http://localhost:8000',
+    aiServiceKey: process.env.AI_SERVICE_KEY ?? '',
+    // un modèle local (Ollama sur CPU) peut mettre plus d'une minute à répondre
+    aiTimeoutMs: Number(process.env.AI_TIMEOUT_MS ?? 180000)
   };
 }

@@ -15,13 +15,15 @@ import { registerPlatform } from './platform.js';
 import { registerCsrf } from './csrf.js';
 import { registerExtensibleFeatures } from './extensibleFeatures.js';
 import { createEmailSender } from './email.js';
+import { registerAppContract } from './appContract.js';
+import { refreshBadges } from './badges.js';
 
 const config = loadConfig();
 const db = createDb(config);
 const emailSender = createEmailSender(config);
 const app = Fastify({ logger: { level: config.logLevel }, bodyLimit: 1024 * 1024 });
 
-await app.register(cors, { origin: config.corsOrigin, credentials: true });
+await app.register(cors, { origin: config.corsOrigins, credentials: true });
 await app.register(cookie);
 await app.register(websocket, { options: { maxPayload: 64 * 1024 } });
 await app.register(rawBody, { field: 'rawBody', global: false, encoding: 'utf8', runFirst: true });
@@ -33,11 +35,13 @@ registerCsrf(app, config);
 app.addHook('onClose', async () => db.end());
 
 app.get('/health', async () => ({ status: 'ok' }));
+if (config.autoVerifyEmail) app.log.warn('EMAIL_AUTO_VERIFY actif : les nouveaux comptes sont validés sans e-mail (développement uniquement)');
 await app.register(async (api) => {
   registerAuth(api, db, config, emailSender);
   registerCollaboration(api, db);
   registerPlatform(api, db);
   registerExtensibleFeatures(api, db);
+  api.register(async (contract) => registerAppContract(contract, db, config, emailSender), { prefix: '/app' });
   api.get('/me', { preHandler: api.auth }, async (request, reply) => {
     const { rows } = await db.query('SELECT id, email, username, display_name, bio, country, city, avatar_url, role, created_at FROM users WHERE id = $1 AND deleted_at IS NULL', [request.user.sub]);
     if (!rows[0]) return reply.code(404).send({ error: 'NOT_FOUND', message: 'User not found' });
@@ -121,5 +125,12 @@ app.setErrorHandler((error, request, reply) => {
   request.log.error({ err: error }, 'request failed');
   return reply.code(error.statusCode ?? 500).send({ error: 'INTERNAL_ERROR', message: config.nodeEnv === 'production' ? 'Internal server error' : error.message });
 });
+
+// badges cohérents avec les données dès le démarrage (règles éventuellement modifiées)
+try {
+  app.log.info({ updated: await refreshBadges(db) }, 'badges recalculated');
+} catch (error) {
+  app.log.error({ err: error }, 'badge refresh at startup failed');
+}
 
 await app.listen({ port: config.port, host: config.host });

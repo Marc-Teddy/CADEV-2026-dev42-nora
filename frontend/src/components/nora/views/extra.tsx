@@ -12,6 +12,7 @@ import { BadgeCheck, Banknote, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useNora } from "@/lib/store";
+import { api } from "@/lib/api-client";
 import { useLang } from "@/lib/i18n";
 import { ViewHeader } from "../shell";
 import { EASE } from "../fx/reveal";
@@ -20,7 +21,21 @@ import { cn } from "@/lib/utils";
 export function MissionsView() {
   const { t, lang } = useLang();
   const missions = useNora((s) => s.missions);
-  const [sent, setSent] = useState<Record<string, boolean>>({});
+  const authed = useNora((s) => s.authed);
+  const navigate = useNora((s) => s.navigate);
+  /* candidatures persistées côté serveur (m.applied) + envois de la session */
+  const [sentNow, setSentNow] = useState<Record<string, boolean>>({});
+  const sent: Record<string, boolean> = Object.fromEntries(missions.map((m) => [m.id, Boolean(m.applied || sentNow[m.id])]));
+  const apply = async (id: string) => {
+    if (!authed) { navigate("login"); return; }
+    try {
+      await api.applyMission(id);
+      setSentNow((p) => ({ ...p, [id]: true }));
+      toast.success(lang === "fr" ? "Candidature envoyée au client ✓" : "Application sent to the client ✓");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    }
+  };
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -69,10 +84,7 @@ export function MissionsView() {
 
             <div className="mt-auto border-t border-line pt-3.5 [margin-top:auto]">
               <Button
-                onClick={() => {
-                  setSent((p) => ({ ...p, [m.id]: true }));
-                  toast.success(lang === "fr" ? "Candidature envoyée — réponse sous 48 h" : "Application sent — reply within 48 h");
-                }}
+                onClick={() => apply(m.id)}
                 disabled={sent[m.id]}
                 className={cn(
                   "h-9 w-full gap-2 rounded-lg font-mono text-[11.5px]",

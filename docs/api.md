@@ -19,6 +19,75 @@ collaboratifs `/spaces`. La messagerie temps réel utilise
 `GET /api/v1/spaces/:spaceId/live` en WebSocket, avec repli HTTP sur
 `GET /api/v1/spaces/:spaceId/messages?before=...&limit=...`.
 
+## Contrat applicatif du frontend (`/api/v1/app`)
+
+L'interface Next.js consomme un jeu de routes dédié, sous `/api/v1/app`, qui
+renvoie exactement les formes JSON de `frontend/src/lib/types.ts` (`Dev`,
+`Project`, `Post`, `Channel`, `ChatMessage`, …). Ces routes lisent et écrivent
+dans les mêmes tables PostgreSQL que le reste de l'API (migration
+`007_app_contract`) : un projet publié depuis l'interface est aussi visible via
+`GET /api/v1/projects`. Les routes « brutes » ci-dessus ne changent pas.
+
+| Méthode | Route | Auth | Rôle |
+|---|---|---|---|
+| POST | `/app/auth/register`, `/app/auth/login` | — | crée/ouvre la session (cookies) et renvoie `{ dev }` |
+| POST | `/app/auth/logout` | — | révoque la session et efface les cookies |
+| GET / PATCH | `/app/auth/me` | ✔ | profil complet (compétences, badges, avatar…) |
+| GET | `/app/devs`, `/app/devs/:username` | optionnelle | annuaire (`following` si connecté) |
+| POST | `/app/devs/:username/follow` | ✔ | suivre / ne plus suivre |
+| GET / POST | `/app/projects` | optionnelle / ✔ | liste (`starredByMe`) / publication |
+| POST | `/app/projects/:id/star`, `/app/projects/:id/join` | ✔ | étoile, rejoindre / quitter l'équipe |
+| GET / POST | `/app/posts` | optionnelle / ✔ | fil d'actualité (`liked`) / publication |
+| POST | `/app/posts/:id/like` | ✔ | j'aime / je n'aime plus |
+| GET | `/app/channels` | — | salons publics (espaces `is_channel`) |
+| GET / POST | `/app/channels/:slug/messages` | — / ✔ | messages d'un salon (poster rend membre) |
+| GET | `/app/challenges`, `/app/missions`, `/app/hackathons`, `/app/stats` | optionnelle | données publiques (`joined` / `applied` si connecté) |
+| POST | `/app/challenges/:id/join` | ✔ | s'inscrire / se désinscrire d'un challenge |
+| POST | `/app/missions/:id/apply` | ✔ | candidater à une mission (notifie son auteur) |
+| GET | `/app/dms` | ✔ | contacts, demandes et fils privés |
+| POST | `/app/dms/:username` | ✔ | message privé (contact accepté requis ; `nora` = agent IA) |
+| GET / POST | `/app/contact-requests` | ✔ | demandes de contact |
+| POST | `/app/contact-requests/:username` | ✔ | `{ "action": "accept" \| "decline" }` |
+| POST | `/app/ai/chat` | ✔ | question à l'assistant (proxy vers `ai-service` `/v1/generate`) |
+| GET | `/app/notifications` | ✔ | contacts, likes, étoiles et messages reçus |
+| GET / POST / DELETE | `/app/workspace` | ✔ | fichiers du Studio |
+| GET | `/app/github/repos?user=` | ✔ | dépôts publics GitHub |
+
+Les erreurs suivent le format commun `{ "error": "CODE", "message": "…" }`,
+avec des messages en français pour l'interface.
+
+**Côté frontend**, le mode backend s'active avec
+`NEXT_PUBLIC_API_URL=/backend/api/v1/app` : `next.config.ts` proxifie
+`/backend/*` vers `BACKEND_URL` (par défaut `http://localhost:8080`), si bien
+que le navigateur reste sur la même origine et que les cookies httpOnly
+fonctionnent. Le client envoie `X-CSRF-Token` sur chaque écriture et renouvelle
+la session via `POST /api/v1/auth/refresh` quand l'accès (15 min) expire.
+
+**Données de démo** : `npm run seed` (base vide uniquement) ou
+`npm run seed:reset` (vide tout) dans `backend/api`, à partir de
+`frontend/scripts/seed-data.ts`. Mot de passe des comptes : `nora-dev42`.
+`./nora.sh` lance le seed automatiquement. En développement sans SMTP, les
+nouveaux comptes sont validés d'office (`EMAIL_AUTO_VERIFY`, jamais en
+production).
+
+### Badges calculés
+
+Les badges ne sont jamais déclarés par l'utilisateur (`PATCH /app/auth/me`
+ignore le champ `badges`) : le serveur les recalcule à partir des données
+(`backend/api/src/badges.js`) après chaque action concernée, au démarrage de
+l'API et à la fin du seed. Les seuils sont regroupés dans `THRESHOLDS`.
+
+| Badge | Règle |
+|---|---|
+| Mentor vérifié | profil mentor actif et au moins 1 mentorat terminé |
+| Fondateur·rice | a créé un projet en statut `production` |
+| Solo Shipper | projet en production sans autre membre dans l'équipe |
+| Challenger | au moins 3 challenges réussis (`challenges_won` + soumissions `passed`) |
+| Open Source | ses projets cumulent au moins 100 étoiles |
+| Architecte | membre d'au moins 3 projets |
+| Étoile montante | au moins 50 abonnés gagnés en 30 jours |
+| Polyglote | parle au moins 3 langues |
+
 ## Marketplace et paiements
 
 Les vendeurs peuvent publier des produits via `POST /products`. Les acheteurs

@@ -191,6 +191,7 @@ export const useNora = create<NoraState>((set, get) => ({
   },
 
   logout: () => {
+    void api.logout();
     setToken(null);
     set({
       authed: false, me: null, view: "landing",

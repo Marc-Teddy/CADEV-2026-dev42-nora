@@ -4,18 +4,17 @@ import crypto from 'node:crypto';
 const ACCESS_COOKIE = 'nora_access';
 const REFRESH_COOKIE = 'nora_refresh';
 
-function createVerificationToken() {
+export function createVerificationToken() {
   const token = crypto.randomBytes(32).toString('base64url');
   return { token, hash: crypto.createHash('sha256').update(token).digest('hex') };
 }
 
 export function registerAuth(app, db, config, emailSender) {
+  // Pas de `namespace` : il remplacerait app.jwt.sign / request.jwtVerify (utilisés partout)
+  // par app.jwt.<namespace>.sign / request.<jwtVerify>, ce qui cassait toute l'authentification.
   app.register(import('@fastify/jwt'), {
     secret: config.accessSecret,
-    cookie: { cookieName: ACCESS_COOKIE, signed: false },
-    namespace: 'access',
-    jwtVerify: 'verifyAccess',
-    jwtSign: 'signAccess'
+    cookie: { cookieName: ACCESS_COOKIE, signed: false }
   });
   app.decorate('auth', async (request, reply) => {
     try {
@@ -27,10 +26,11 @@ export function registerAuth(app, db, config, emailSender) {
 
   const cookieOptions = { httpOnly: true, secure: config.cookieSecure, sameSite: 'lax', path: '/' };
   const issueTokens = async (reply, user) => {
-    const access = app.jwt.signAccess({ sub: user.id, role: user.role }, { expiresIn: config.accessTtl });
+    const access = app.jwt.sign({ sub: user.id, role: user.role }, { expiresIn: config.accessTtl });
     const refreshJti = crypto.randomUUID();
-    const refresh = app.jwt.signAccess({ sub: user.id, jti: refreshJti, type: 'refresh' }, {
-      secret: config.refreshSecret, expiresIn: config.refreshTtl
+    // fast-jwt attend `key` (et non `secret`) pour signer avec la clé de rafraîchissement
+    const refresh = app.jwt.sign({ sub: user.id, jti: refreshJti, type: 'refresh' }, {
+      key: config.refreshSecret, expiresIn: config.refreshTtl
     });
     await db.query(
       'INSERT INTO refresh_tokens (jti, user_id, expires_at) VALUES ($1, $2, now() + $3::interval)',
@@ -39,6 +39,8 @@ export function registerAuth(app, db, config, emailSender) {
     reply.setCookie(ACCESS_COOKIE, access, { ...cookieOptions, maxAge: 900 });
     reply.setCookie(REFRESH_COOKIE, refresh, { ...cookieOptions, maxAge: 604800 });
   };
+  app.decorate('issueTokens', issueTokens);
+  app.decorate('clearAuthCookies', (reply) => reply.clearCookie(ACCESS_COOKIE, cookieOptions).clearCookie(REFRESH_COOKIE, cookieOptions));
 
   app.get('/auth/github', async (request, reply) => {
     if (!config.githubClientId || !config.githubCallbackUrl) {
@@ -95,6 +97,18 @@ export function registerAuth(app, db, config, emailSender) {
   }, async (request, reply) => {
     const email = request.body.email.trim().toLowerCase();
     const hash = await argon2.hash(request.body.password, { type: argon2.argon2id });
+    if (config.autoVerifyEmail) {
+      try {
+        const { rows } = await db.query(
+          'INSERT INTO users (email, username, password_hash, email_verified_at) VALUES ($1, $2, $3, now()) RETURNING id, email, username, role',
+          [email, request.body.username, hash]
+        );
+        return reply.code(201).send({ user: rows[0], emailVerificationRequired: false });
+      } catch (error) {
+        if (error.code === '23505') return reply.code(409).send({ error: 'CONFLICT', message: 'Email or username already exists' });
+        throw error;
+      }
+    }
     const verification = createVerificationToken();
     const client = await db.transaction();
     try {
@@ -184,7 +198,7 @@ export function registerAuth(app, db, config, emailSender) {
     const token = request.cookies?.[REFRESH_COOKIE];
     if (!token) return reply.code(401).send({ error: 'UNAUTHENTICATED', message: 'Refresh token required' });
     try {
-      const payload = app.jwt.verify(token, { secret: config.refreshSecret });
+      const payload = app.jwt.verify(token, { key: config.refreshSecret });
       if (payload.type !== 'refresh') throw new Error('Invalid token type');
       const result = await db.query('DELETE FROM refresh_tokens WHERE jti = $1 AND user_id = $2 AND revoked_at IS NULL AND expires_at > now() RETURNING user_id', [payload.jti, payload.sub]);
       if (!result.rowCount) throw new Error('Revoked refresh token');

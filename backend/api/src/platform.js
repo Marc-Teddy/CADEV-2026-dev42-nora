@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { refreshBadges } from './badges.js';
 
 const adminOnly = async (request, reply) => {
   try {
@@ -82,11 +83,13 @@ export function registerPlatform(api, db) {
   });
   api.get('/mentors', async () => ({ mentors: (await db.query("SELECT m.*, u.username, u.display_name, u.avatar_url FROM mentor_profiles m JOIN users u ON u.id = m.user_id WHERE m.status = 'active' LIMIT 100")).rows }));
   api.post('/mentors/me', { preHandler: api.auth }, async (request) => {
-    const { rows } = await db.query('INSERT INTO mentor_profiles (user_id, specialties, languages, availability, hourly_rate_minor, currency, bio) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (user_id) DO UPDATE SET specialties = EXCLUDED.specialties, languages = EXCLUDED.languages, availability = EXCLUDED.availability, hourly_rate_minor = EXCLUDED.hourly_rate_minor, currency = EXCLUDED.currency, bio = EXCLUDED.bio RETURNING *', [request.user.sub, request.body.specialties ?? [], request.body.languages ?? [], request.body.availability ?? {}, request.body.hourlyRateMinor ?? null, request.body.currency ?? null, request.body.bio ?? null]);
+    const { rows } = await db.query('INSERT INTO mentor_profiles (user_id, specialties, languages, availability, hourly_rate_minor, currency, bio) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (user_id) DO UPDATE SET specialties = EXCLUDED.specialties, languages = EXCLUDED.languages, availability = EXCLUDED.availability, hourly_rate_minor = EXCLUDED.hourly_rate_minor, currency = EXCLUDED.currency, bio = EXCLUDED.bio, status = \'active\' RETURNING *', [request.user.sub, request.body.specialties ?? [], request.body.languages ?? [], request.body.availability ?? {}, request.body.hourlyRateMinor ?? null, request.body.currency ?? null, request.body.bio ?? null]);
+    await refreshBadges(db, [request.user.sub]);
     return { mentor: rows[0] };
   });
   api.delete('/mentors/me', { preHandler: api.auth }, async (request) => {
     await db.query("UPDATE mentor_profiles SET status = 'inactive' WHERE user_id = $1", [request.user.sub]);
+    await refreshBadges(db, [request.user.sub]);
     return { ok: true };
   });
   api.post('/mentors/:mentorId/requests', { preHandler: api.auth, schema: { body: { type: 'object', required: ['goal'], additionalProperties: false, properties: { goal: { type: 'string', minLength: 10, maxLength: 2000 } } } } }, async (request, reply) => {
@@ -102,6 +105,7 @@ export function registerPlatform(api, db) {
   api.patch('/mentorship/requests/:id', { preHandler: api.auth, schema: { body: { type: 'object', required: ['status'], additionalProperties: false, properties: { status: { type: 'string', enum: ['accepted', 'declined', 'completed', 'cancelled'] } } } } }, async (request, reply) => {
     const { rows } = await db.query('UPDATE mentorship_requests SET status = $1 WHERE id = $2 AND (mentor_id = $3 OR mentee_id = $3) RETURNING *', [request.body.status, request.params.id, request.user.sub]);
     if (!rows[0]) return reply.code(404).send({ error: 'NOT_FOUND', message: 'Mentorship request not found' });
+    await refreshBadges(db, [rows[0].mentor_id]);
     return { request: rows[0] };
   });
   api.get('/products', async (request) => {

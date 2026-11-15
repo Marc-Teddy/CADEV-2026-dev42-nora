@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useNora, devByUsername } from "@/lib/store";
+import { api } from "@/lib/api-client";
 import { useLang } from "@/lib/i18n";
 import { NoraAvatar, fmt, CrownIcon } from "../shared";
 import { ViewHeader } from "../shell";
@@ -616,11 +617,30 @@ const diffStyle: Record<string, string> = {
 
 export function ChallengesView() {
   const { t, lang } = useLang();
-  const { viewProfile } = useNora();
+  const { viewProfile, navigate } = useNora();
   const challenges = useNora((s) => s.challenges);
   const devs = useNora((s) => s.devs);
   const meUsername = useNora((s) => s.me?.username ?? "");
-  const [joined, setJoined] = useState<Record<string, boolean>>({});
+  const authed = useNora((s) => s.authed);
+  /* inscriptions persistées côté serveur ; surcharge locale après un clic */
+  const [override, setOverride] = useState<Record<string, { joined: boolean; participants: number }>>({});
+  const joinedOf = (c: (typeof challenges)[number]) => override[c.id]?.joined ?? Boolean(c.joined);
+  const toggleJoin = async (c: (typeof challenges)[number]) => {
+    if (!authed) { navigate("login"); return; }
+    try {
+      const r = await api.joinChallenge(c.id);
+      setOverride((p) => ({ ...p, [c.id]: r }));
+      if (r.joined) {
+        toast.success(lang === "fr" ? "Inscription enregistrée ⚡" : "You're in ⚡", {
+          action: { label: lang === "fr" ? "Coder dans le Studio" : "Code in Studio", onClick: () => navigate("studio") },
+        });
+      } else {
+        toast(lang === "fr" ? "Désinscription enregistrée" : "You left the challenge");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    }
+  };
 
   /* classement réel : réputation des devs de la plateforme */
   const board = [...devs].sort((a, b) => b.reputation - a.reputation).slice(0, 8);
@@ -659,7 +679,7 @@ export function ChallengesView() {
             <div className="mt-3.5 grid grid-cols-3 gap-2 font-mono text-[10.5px]">
               <div>
                 <p className="text-muted-foreground">{t("chal.participants")}</p>
-                <p className="mt-0.5 tabular-nums text-foreground">{fmt(c.participants)}</p>
+                <p className="mt-0.5 tabular-nums text-foreground">{fmt(override[c.id]?.participants ?? c.participants)}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">{t("chal.successRate")}</p>
@@ -676,16 +696,13 @@ export function ChallengesView() {
               </span>
               <Button
                 size="sm"
-                onClick={() => {
-                  setJoined((p) => ({ ...p, [c.id]: !p[c.id] }));
-                  if (!joined[c.id]) toast.success(lang === "fr" ? "Éditeur ouvert — bon courage ⚡" : "Editor open — good luck ⚡");
-                }}
+                onClick={() => toggleJoin(c)}
                 className={cn(
                   "h-8 rounded-md px-3 font-mono text-[10.5px]",
-                  joined[c.id] ? "border border-signal-muted/60 bg-transparent text-signal" : "bg-flare text-flare-foreground hover:bg-flare/90",
+                  joinedOf(c) ? "border border-signal-muted/60 bg-transparent text-signal" : "bg-flare text-flare-foreground hover:bg-flare/90",
                 )}
               >
-                {joined[c.id] ? "✓" : t("chal.participate")}
+                {joinedOf(c) ? "✓" : t("chal.participate")}
               </Button>
             </div>
           </motion.article>

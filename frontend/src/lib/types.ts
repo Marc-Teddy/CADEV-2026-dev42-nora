@@ -129,6 +129,7 @@ export interface Challenge {
   endsIn: string;
   points: number;
   successRate: number;
+  joined?: boolean; // le dev connecté est inscrit
 }
 
 export interface LeaderRow {
@@ -152,6 +153,7 @@ export interface Mission {
   money: "Orange Money" | "MTN MoMo" | "Wave" | "M-Pesa" | "Moov Money";
   urgency: "Immédiat" | "Cette semaine" | "Flexible";
   match: number;
+  applied?: boolean; // le dev connecté a déjà candidaté
 }
 
 export interface Hackathon {

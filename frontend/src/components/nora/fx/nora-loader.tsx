@@ -39,8 +39,10 @@ export function NoraLoader({
 
   useEffect(() => {
     if (scheduled.current) return;
-    const MIN_MS = 2000;
-    const SETTLE_MS = 950;
+    const MIN_MS = 1800;
+    // durée pendant laquelle le logo complet (N + NORA + sous-titre) reste
+    // figé et visible, comme sur la photo, avant le fondu de sortie.
+    const SETTLE_MS = 1900;
 
     const start = () => {
       if (scheduled.current) return;

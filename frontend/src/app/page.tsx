@@ -8,7 +8,7 @@
      Seules la landing et les pages d'authentification sont publiques.
    ============================================================ */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { useNora } from "@/lib/store";
@@ -24,7 +24,7 @@ import { ProfileView } from "@/components/nora/views/profile";
 import { StudioView } from "@/components/nora/views/studio";
 import { SalonsView, ChallengesView } from "@/components/nora/views/salons";
 import { MissionsView } from "@/components/nora/views/extra";
-import { Logo } from "@/components/nora/shared";
+import { NoraLoader } from "@/components/nora/fx/nora-loader";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -32,6 +32,8 @@ export default function Home() {
   const { view, authed, booting } = useNora();
   const { t } = useLang();
   const authToastShown = useRef(false);
+  /* splash animé : masque la page jusqu'à la fin du chargement + de l'animation */
+  const [splashDone, setSplashDone] = useState(false);
 
   const isAuthPage = view === "login" || view === "register";
   /* garde d'accès : aucune vue de la plateforme sans compte */
@@ -57,17 +59,6 @@ export default function Home() {
     }
   }, [needsAuth, t]);
 
-  if (booting) {
-    return (
-      <div className="grid min-h-svh place-items-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <Logo size={34} />
-          <span className="size-5 animate-spin rounded-full border-2 border-flare/30 border-t-flare" />
-        </div>
-      </div>
-    );
-  }
-
   const inApp = !needsAuth && view !== "landing" && !isAuthPage;
 
   const viewFor = () => {
@@ -91,6 +82,9 @@ export default function Home() {
 
   return (
     <>
+      {!splashDone && (
+        <NoraLoader active={booting} onFinish={() => setSplashDone(true)} />
+      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={inApp ? `app-${view}` : view}

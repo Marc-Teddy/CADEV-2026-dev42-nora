@@ -93,15 +93,6 @@ export function StudioView() {
     if (!workspaceLoaded) loadWorkspace();
   }, [workspaceLoaded, loadWorkspace]);
 
-  /* ouvrir le premier fichier une fois chargé */
-  useEffect(() => {
-    if (workspaceLoaded && workspaceFiles.length > 0 && !activePath) {
-      const first = workspaceFiles.find((f) => f.path.endsWith(".js")) ?? workspaceFiles[0];
-      openFile(first.path);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspaceLoaded, workspaceFiles]);
-
   /* contenu affiché : brouillon local sinon contenu servi par l'API */
   const fileOf = (path: string) => workspaceFiles.find((f) => f.path === path);
   const activeContent = activePath ? (drafts[activePath] ?? fileOf(activePath)?.content ?? "") : "";
@@ -111,6 +102,17 @@ export function StudioView() {
     setOpenPaths((p) => (p.includes(path) ? p : [...p, path]));
     setActivePath(path);
   };
+
+  /* Ouvre le premier fichier une fois le workspace chargé (données servies en
+     asynchrone) : initialisation unique côté client, le setState est ici
+     volontaire et ne s'exécute qu'au chargement, pas à chaque rendu. */
+  useEffect(() => {
+    if (workspaceLoaded && workspaceFiles.length > 0 && !activePath) {
+      const first = workspaceFiles.find((f) => f.path.endsWith(".js")) ?? workspaceFiles[0];
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- init unique depuis les données chargées
+      openFile(first.path);
+    }
+  }, [workspaceLoaded, workspaceFiles, activePath]);
 
   const closeFile = (path: string) => {
     setOpenPaths((p) => {
@@ -143,7 +145,7 @@ export function StudioView() {
     } finally {
       setSaving(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [activePath, drafts, dirty, saveWorkspaceFile, t]);
 
   /* Ctrl/Cmd+S global (hors éditeur) */
@@ -219,7 +221,7 @@ try {
       pushLog("err", [e.message || "Erreur"]);
       stop();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [activePath, drafts, pushLog, t]);
 
   /* ---------- NORA IA ---------- */

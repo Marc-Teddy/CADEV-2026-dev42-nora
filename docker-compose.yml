@@ -1,3 +1,18 @@
+# ============================================================
+#  NORA — Équipe dev42 · CADEV 2026
+#  Stack complète en une commande :  docker compose up --build
+#
+#  Services :
+#    postgres   :5432  base de données
+#    migrate            applique les migrations puis s'arrête (one-shot)
+#    backend    :8080  API Fastify (REST, auth JWT, WebSocket)
+#    ai-service :8000  service IA FastAPI
+#    frontend   :3000  application Next.js
+#
+#  Les valeurs ci-dessous sont des secrets de DÉVELOPPEMENT uniquement.
+#  En production, surchargez-les via un fichier .env ou l'environnement.
+# ============================================================
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -14,19 +29,97 @@ services:
       retries: 10
     volumes:
       - nora-postgres:/var/lib/postgresql/data
+
+  # One-shot : applique les migrations puis se termine. Le backend attend
+  # qu'il réussisse avant de démarrer (depends_on: service_completed_successfully).
+  migrate:
+    build:
+      context: .
+      dockerfile: backend/api/Dockerfile
+    environment:
+      DATABASE_URL: postgres://nora:nora@postgres:5432/nora
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["node_modules/.bin/node-pg-migrate", "-m", "db/migrations", "up"]
+    restart: "no"
+
   backend:
     build:
       context: .
       dockerfile: backend/api/Dockerfile
-    env_file:
-      - ./backend/api/.env
+    # Le backend lit sa configuration depuis l'environnement (src/config.js).
+    # On surcharge la commande de l'image pour ne PAS dépendre d'un fichier .env
+    # embarqué (qui n'existe pas dans l'image).
+    command: ["node", "src/index.js"]
+    environment:
+      NODE_ENV: production
+      PORT: "8080"
+      HOST: 0.0.0.0
+      CORS_ORIGIN: http://localhost:3000,http://127.0.0.1:3000
+      DATABASE_URL: postgres://nora:nora@postgres:5432/nora
+      DATABASE_POOL_MAX: "10"
+      DATABASE_SSL: "false"
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret-change-me-0123456789abcd}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-me-0123456789abcd}
+      JWT_ACCESS_TTL: 15m
+      JWT_REFRESH_TTL: 7d
+      COOKIE_SECURE: "false"
+      RATE_LIMIT_MAX: "100"
+      RATE_LIMIT_WINDOW_MS: "60000"
+      LOG_LEVEL: info
+      # Comptes validés d'office en dev (pas de SMTP).
+      EMAIL_AUTO_VERIFY: "true"
+      # Liaison avec le service IA.
+      AI_SERVICE_URL: http://ai-service:8000
+      AI_SERVICE_KEY: ${AI_SERVICE_KEY:-nora-internal-dev-key}
+      AI_TIMEOUT_MS: "180000"
     depends_on:
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     ports:
       - "8080:8080"
     read_only: true
     tmpfs:
       - /tmp
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    environment:
+      ENVIRONMENT: development
+      # Renseignez LLM_API_KEY pour activer réellement les réponses IA
+      # (sinon le service répond 503 et le backend se dégrade proprement).
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.deepseek.com/v1}
+      LLM_MODEL: ${LLM_MODEL:-deepseek-coder}
+      INTERNAL_API_KEY: ${AI_SERVICE_KEY:-nora-internal-dev-key}
+      RATE_LIMIT_PER_MINUTE: "20"
+      DEFAULT_ANSWER_LANGUAGE: fr
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Variable publique Next : figée au BUILD. Active le mode « backend
+        # d'équipe » (toutes les données viennent de l'API Fastify via le proxy).
+        NEXT_PUBLIC_API_URL: /backend/api/v1/app
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      # Cible du proxy /backend défini dans next.config.ts (réseau interne compose).
+      BACKEND_URL: http://backend:8080
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
 volumes:
   nora-postgres:

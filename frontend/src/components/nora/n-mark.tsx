@@ -1,7 +1,11 @@
 /* ============================================================
-   NORA — Marque « N » en blocs pixelisés (dégradé vert-lime ->
-   magenta). Source unique de la forme du logo : utilisée par le
-   logo de la page (topbar, landing, auth) et par le splash animé.
+   NORA — Formes du logo en blocs pixelisés (dégradé vert-lime ->
+   magenta). Source unique :
+   · buildMark : la forme finale du logo (diagonale/éclair, comme
+     l'image de la marque) — utilisée par le logo de la page et par
+     la fin du splash.
+   · buildN : un « N » droit, utilisé comme forme d'intro animée du
+     splash (il apparaît, tourne, puis glisse vers buildMark).
    ============================================================ */
 
 export const COLS = 12;
@@ -9,8 +13,32 @@ export const ROWS = 10;
 
 export type Cell = { c: number; r: number };
 
-/* Lettre « N » : jambage gauche, diagonale haut-gauche -> bas-droite,
-   jambage droit. */
+function dedupe(cells: Cell[]): Cell[] {
+  const seen = new Set<string>();
+  return cells.filter(({ c, r }) => {
+    const k = `${c},${r}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
+
+/* Forme finale du logo (diagonale / éclair) : barre haut-droite,
+   diagonale haut-droite -> bas-gauche, barre bas-gauche. */
+export function buildMark(): Cell[] {
+  const cells: Cell[] = [];
+  const push = (c: number, r: number) => cells.push({ c, r });
+  for (let r = 1; r <= 2; r++) for (let c = 4; c <= 8; c++) push(c, r);
+  for (let r = 2; r <= 7; r++) {
+    const c = 7 - (r - 2);
+    push(c, r);
+    push(c + 1, r);
+  }
+  for (let r = 7; r <= 8; r++) for (let c = 2; c <= 6; c++) push(c, r);
+  return dedupe(cells);
+}
+
+/* Forme d'intro : un « N » droit (jambages + diagonale). */
 export function buildN(): Cell[] {
   const cells: Cell[] = [];
   const push = (c: number, r: number) => cells.push({ c, r });
@@ -29,13 +57,7 @@ export function buildN(): Cell[] {
     push(c, r);
     push(c + 1, r);
   }
-  const seen = new Set<string>();
-  return cells.filter(({ c, r }) => {
-    const k = `${c},${r}`;
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
+  return dedupe(cells);
 }
 
 /* Dégradé : vert-lime (bas-gauche) -> jaune -> orange -> rose -> magenta (haut-droite). */
@@ -65,12 +87,12 @@ export function cellColor(c: number, r: number): string {
   return `rgb(${mix(r1, r2)}, ${mix(g1, g2)}, ${mix(b1, b2)})`;
 }
 
-/* viewBox ajustée aux blocs du « N » (colonnes 2..9, lignes 1..8). */
+/* viewBox ajustée (colonnes 2..9, lignes 1..8). */
 export const N_VIEWBOX = "18 8 84 84";
 
-/* Logo statique de la page. */
+/* Logo statique de la page : la forme finale (diagonale / éclair). */
 export function NMark({ size = 32, glow = true }: { size?: number; glow?: boolean }) {
-  const cells = buildN();
+  const cells = buildMark();
   const fid = "nmark-glow";
   return (
     <svg width={size} height={size} viewBox={N_VIEWBOX} aria-hidden>

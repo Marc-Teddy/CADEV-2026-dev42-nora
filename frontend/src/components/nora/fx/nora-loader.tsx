@@ -10,62 +10,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-
-const COLS = 12;
-const ROWS = 10;
-
-type Cell = { c: number; r: number };
-
-/* Génère les blocs de l'éclair « N » : barre haute, diagonale, barre basse. */
-function buildBolt(): Cell[] {
-  const cells: Cell[] = [];
-  const push = (c: number, r: number) => cells.push({ c, r });
-  // barre supérieure (haut-droite)
-  for (let r = 1; r <= 2; r++) for (let c = 4; c <= 8; c++) push(c, r);
-  // diagonale haut-droite -> bas-gauche (épaisseur 2)
-  for (let r = 2; r <= 7; r++) {
-    const c = 7 - (r - 2);
-    push(c, r);
-    push(c + 1, r);
-  }
-  // barre inférieure (bas-gauche)
-  for (let r = 7; r <= 8; r++) for (let c = 2; c <= 6; c++) push(c, r);
-  // dédoublonnage
-  const seen = new Set<string>();
-  return cells.filter(({ c, r }) => {
-    const k = `${c},${r}`;
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
-}
-
-/* Dégradé : vert-lime (bas-gauche) -> jaune -> orange -> rose -> magenta (haut-droite). */
-const STOPS: [number, [number, number, number]][] = [
-  [0.0, [166, 226, 46]],
-  [0.3, [250, 204, 21]],
-  [0.55, [249, 115, 22]],
-  [0.78, [244, 63, 125]],
-  [1.0, [208, 38, 143]],
-];
-
-function cellColor(c: number, r: number): string {
-  const v = (c / (COLS - 1) + (ROWS - 1 - r) / (ROWS - 1)) / 2;
-  let lo = STOPS[0];
-  let hi = STOPS[STOPS.length - 1];
-  for (let i = 0; i < STOPS.length - 1; i++) {
-    if (v >= STOPS[i][0] && v <= STOPS[i + 1][0]) {
-      lo = STOPS[i];
-      hi = STOPS[i + 1];
-      break;
-    }
-  }
-  const t = hi[0] === lo[0] ? 0 : (v - lo[0]) / (hi[0] - lo[0]);
-  const mix = (a: number, b: number) => Math.round(a + (b - a) * t);
-  const [r1, g1, b1] = lo[1];
-  const [r2, g2, b2] = hi[1];
-  return `rgb(${mix(r1, r2)}, ${mix(g1, g2)}, ${mix(b1, b2)})`;
-}
+import { buildN, cellColor } from "@/components/nora/n-mark";
 
 type Phase = "loading" | "settle" | "out";
 
@@ -79,7 +24,7 @@ export function NoraLoader({
   const [phase, setPhase] = useState<Phase>("loading");
   const mountedAt = useRef<number>(Date.now());
 
-  const cells = useMemo(() => buildBolt(), []);
+  const cells = useMemo(() => buildN(), []);
   /* ordre d'assemblage/onde : de haut-droite vers bas-gauche */
   const ordered = useMemo(
     () => cells.map((c, i) => ({ ...c, i })).sort((a, b) => a.r - b.r || b.c - a.c),

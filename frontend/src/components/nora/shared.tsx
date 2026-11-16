@@ -5,6 +5,7 @@
    ============================================================ */
 
 import { cn } from "@/lib/utils";
+import { NMark } from "@/components/nora/n-mark";
 import type { Badge } from "@/lib/types";
 import { useLang } from "@/lib/i18n";
 import { useTheme } from "next-themes";
@@ -55,7 +56,7 @@ export function AfricaMark({ size = 96 }: { size?: number }) {
 export function Logo({ size = 28, wordmark = true }: { size?: number; wordmark?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2.5 select-none">
-      <AfricaMark size={size} />
+      <NMark size={size} />
       {wordmark && (
         <span className="font-display font-bold tracking-[0.18em] text-foreground" style={{ fontSize: size * 0.56 }}>
           NORA

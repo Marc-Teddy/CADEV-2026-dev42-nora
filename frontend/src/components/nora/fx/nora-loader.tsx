@@ -79,10 +79,16 @@ export function NoraLoader({
         >
           <SplashStyles />
           <div className="flex flex-col items-center gap-7">
-            <div
+            <motion.div
               className={`nora-splash-bolt ${phase === "settle" ? "is-settled" : ""}`}
               aria-label="NORA"
               role="img"
+              style={{ transformOrigin: "center" }}
+              initial={{ rotate: 0 }}
+              /* le N fait un tour complet (360°) puis se fige à l'endroit,
+                 exactement comme le logo de la photo */
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <svg viewBox="0 0 120 100" width="300" className="max-w-[62vw]">
                 <defs>
@@ -115,7 +121,7 @@ export function NoraLoader({
                   ))}
                 </g>
               </svg>
-            </div>
+            </motion.div>
 
             <motion.div
               className="flex flex-col items-center gap-1"

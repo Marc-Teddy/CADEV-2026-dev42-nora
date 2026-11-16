@@ -16,20 +16,29 @@ const ROWS = 10;
 
 type Cell = { c: number; r: number };
 
-/* Génère les blocs de l'éclair « N » : barre haute, diagonale, barre basse. */
+/* Génère les blocs de la lettre « N » : jambage gauche, diagonale
+   (haut-gauche -> bas-droite) et jambage droit. */
 function buildBolt(): Cell[] {
   const cells: Cell[] = [];
   const push = (c: number, r: number) => cells.push({ c, r });
-  // barre supérieure (haut-droite)
-  for (let r = 1; r <= 2; r++) for (let c = 4; c <= 8; c++) push(c, r);
-  // diagonale haut-droite -> bas-gauche (épaisseur 2)
-  for (let r = 2; r <= 7; r++) {
-    const c = 7 - (r - 2);
+  const TOP = 1;
+  const BOT = 8;
+  // jambage gauche (vertical)
+  for (let r = TOP; r <= BOT; r++) {
+    push(2, r);
+    push(3, r);
+  }
+  // jambage droit (vertical)
+  for (let r = TOP; r <= BOT; r++) {
+    push(8, r);
+    push(9, r);
+  }
+  // diagonale haut-gauche -> bas-droite (épaisseur 2)
+  for (let r = TOP; r <= BOT; r++) {
+    const c = 3 + Math.round(((r - TOP) * 5) / (BOT - TOP));
     push(c, r);
     push(c + 1, r);
   }
-  // barre inférieure (bas-gauche)
-  for (let r = 7; r <= 8; r++) for (let c = 2; c <= 6; c++) push(c, r);
   // dédoublonnage
   const seen = new Set<string>();
   return cells.filter(({ c, r }) => {

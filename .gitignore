@@ -1,0 +1,19 @@
+node_modules/
+.next/
+dist/
+build/
+
+# environnements locaux (secrets générés par nora.sh)
+.env
+!.env.example
+.run/
+logs/
+
+# frontend : base SQLite locale et journaux du serveur de dev
+frontend/db/
+frontend/dev.log
+frontend/server.log
+
+# service IA
+ai-service/.venv/
+__pycache__/
